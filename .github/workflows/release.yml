@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  signed-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: 1.26.5
+      - name: Verify signed annotated tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          object=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$GITHUB_REF_NAME")
+          test "$(jq -r '.object.type' <<<"$object")" = tag
+          tag_sha=$(jq -r '.object.sha' <<<"$object")
+          verification=$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$tag_sha")
+          test "$(jq -r '.verification.verified' <<<"$verification")" = true
+      - run: make check
+      - run: git archive --format=tar.gz --output="go-router-${GITHUB_REF_NAME}.tar.gz" "$GITHUB_REF_NAME"
+      - uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373
+        with:
+          subject-path: "go-router-${{ github.ref_name }}.tar.gz"
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" "go-router-${GITHUB_REF_NAME}.tar.gz" --verify-tag --generate-notes
