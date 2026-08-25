@@ -7,6 +7,11 @@ Versioning.
 
 ## [Unreleased]
 
+### Fixed
+
+- Exercise router, middleware, JSON-RPC, and service composition through
+  versioned module archives without sibling checkouts or Git fetches.
+
 ### Changed
 
 - Exclude intentional nested modules from root local-proxy archives so local,

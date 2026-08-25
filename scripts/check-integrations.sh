@@ -1,29 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-root="$(pwd)"
-repository_root="$(git rev-parse --show-toplevel)"
 temporary="$(mktemp -d)"
-trap 'rm -rf "$temporary"' EXIT
+cleanup() {
+  exit_code=$?
+  trap - EXIT HUP INT TERM
+  chmod -R u+w "$temporary" 2>/dev/null || true
+  find "$temporary" -depth -delete
+  exit "$exit_code"
+}
+trap cleanup EXIT HUP INT TERM
 
-repositories=(service http-middleware jsonrpc)
-revisions=(
-  258473c234466be0958762b1275d161929754503
-  85c4cac44c89f30c53f5281dbde4f271479f8668
-  5c344af1ab723fe0bd8c2f6fb1c64439c9387df8
-)
-for index in "${!repositories[@]}"; do
-  repository="${repositories[$index]}"
-  local_path="$root/../$repository"
-  if [[ "${ROUTER_INTEGRATION_REMOTE_ONLY:-0}" != 1 && -f "$local_path/go.mod" ]]; then
-    ln -s "$local_path" "$temporary/$repository"
-    continue
-  fi
-  git init -q "$temporary/$repository"
-  git -C "$temporary/$repository" fetch -q --depth=1 \
-    "https://github.com/faustbrian/${repository}.git" "${revisions[$index]}"
-  git -C "$temporary/$repository" checkout -q FETCH_HEAD
-done
+export GOCACHE="$temporary/gocache"
+export GOMODCACHE="$temporary/gomodcache"
+export GOPATH="$temporary/gopath"
+export GOWORK=off
 
 mkdir "$temporary/integration"
 cat >"$temporary/integration/go.mod" <<EOF
@@ -32,52 +23,12 @@ module routerintegration
 go 1.26.6
 
 require (
-  github.com/faustbrian/go-http-middleware v0.0.0
-  github.com/faustbrian/go-jsonrpc v0.0.0
-  github.com/faustbrian/go-router v0.0.0
-  github.com/faustbrian/go-service v0.0.0
+  github.com/faustbrian/go-http-middleware v1.0.0
+  github.com/faustbrian/go-jsonrpc v1.0.0
+  github.com/faustbrian/go-router v1.0.0
+  github.com/faustbrian/go-service v1.0.0
 )
-
-replace github.com/faustbrian/go-router => $root
-replace github.com/faustbrian/go-service => $temporary/service
-replace github.com/faustbrian/go-http-middleware => $temporary/http-middleware
-replace github.com/faustbrian/go-jsonrpc => $temporary/jsonrpc
 EOF
-if [[ "${ROUTER_INTEGRATION_REMOTE_ONLY:-0}" != 1 ]]; then
-  jq -r '
-    . as $catalog
-    | def closure($directories):
-        ([
-          $catalog.modules[]
-          | select(.directory as $directory | $directories | index($directory))
-          | .owned_dependencies[]
-        ] | unique) as $dependencies
-        | ([
-          $catalog.modules[]
-          | select(.module_path as $path | $dependencies | index($path))
-          | .directory
-        ] + $directories | unique) as $next
-        | if $next == $directories then $next else closure($next) end;
-    closure(["pkg/http-middleware", "pkg/jsonrpc", "pkg/service"])
-    | .[] as $directory
-    | $catalog.modules[]
-    | select(.directory == $directory)
-    | [.module_path, .directory]
-    | @tsv
-  ' "$repository_root/modules.json" |
-    while IFS=$'\t' read -r module_path module_directory; do
-      case "$module_path" in
-        github.com/faustbrian/go-http-middleware | \
-          github.com/faustbrian/go-jsonrpc | \
-          github.com/faustbrian/go-service)
-          continue
-          ;;
-      esac
-      printf 'replace %s => %s/%s\n' \
-        "$module_path" "$repository_root" "$module_directory" \
-        >>"$temporary/integration/go.mod"
-    done
-fi
 cat >"$temporary/integration/integration_test.go" <<'EOF'
 package integration_test
 
