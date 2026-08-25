@@ -1,3 +1,3 @@
-module github.com/faustbrian/golib/pkg/router
+module github.com/faustbrian/go-router
 
 go 1.26.6

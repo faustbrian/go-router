@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	router "github.com/faustbrian/golib/pkg/router"
+	router "github.com/faustbrian/go-router"
 )
 
 // TestingT is the subset of testing.TB used by the helpers.

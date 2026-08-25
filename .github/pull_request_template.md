@@ -1,4 +1,21 @@
-Describe the behavior and why it belongs in an explicit routing library.
+## Result
 
-Confirm that public behavior has tests and documentation, local blocking
-targets pass, and no hidden registration or framework concern was introduced.
+Describe the resulting behavior and why it is needed.
+
+## Compatibility And Delivery
+
+Describe material compatibility, migration, rollout, or risk consequences.
+Omit topics that do not apply.
+
+## Specification Decisions
+
+For parsing, validation, serialization, resolution, canonicalization,
+transport, or protocol changes, list:
+
+- affected decision identifiers;
+- changed normative sources, registries, fixtures, or errata;
+- selected observable behavior and alternatives considered;
+- compatibility and wire consequences;
+- executable conformance and interoperability evidence.
+
+State `Not applicable` only when no specification-backed behavior can change.

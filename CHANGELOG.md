@@ -7,6 +7,8 @@ Versioning.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-08-25
+
 ### Documentation
 
 - Replace obsolete standalone-repository links and workflow claims with
@@ -16,6 +18,7 @@ Versioning.
 
 ### Changed
 
+- Publish the module from its standalone `github.com/faustbrian/go-router` identity while preserving its documented API and behavior.
 - Link conformance and contribution guidance directly to the canonical
   specification decision register.
 - Delegate local mutation checks to the canonical exact-100 repository runner
@@ -98,3 +101,6 @@ Versioning.
 - Align default 404 and non-automatic 405 responses with `http.ServeMux`.
 - Document and freeze every dispatch difference caused by automatic OPTIONS,
   unsupported method misses, host extensions, redirect policy, and CONNECT.
+
+[Unreleased]: https://github.com/faustbrian/go-router/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/faustbrian/go-router/releases/tag/v1.0.0

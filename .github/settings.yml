@@ -1,6 +1,6 @@
 repository:
   description: Explicit immutable net/http routing, composition, and URL generation for Go
-  homepage: https://pkg.go.dev/github.com/faustbrian/golib/pkg/router
+  homepage: https://pkg.go.dev/github.com/faustbrian/go-router
   topics:
     - go
     - golang

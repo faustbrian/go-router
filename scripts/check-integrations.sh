@@ -32,16 +32,16 @@ module routerintegration
 go 1.26.6
 
 require (
-  github.com/faustbrian/golib/pkg/http-middleware v0.0.0
-  github.com/faustbrian/golib/pkg/jsonrpc v0.0.0
-  github.com/faustbrian/golib/pkg/router v0.0.0
-  github.com/faustbrian/golib/pkg/service v0.0.0
+  github.com/faustbrian/go-http-middleware v0.0.0
+  github.com/faustbrian/go-jsonrpc v0.0.0
+  github.com/faustbrian/go-router v0.0.0
+  github.com/faustbrian/go-service v0.0.0
 )
 
-replace github.com/faustbrian/golib/pkg/router => $root
-replace github.com/faustbrian/golib/pkg/service => $temporary/service
-replace github.com/faustbrian/golib/pkg/http-middleware => $temporary/http-middleware
-replace github.com/faustbrian/golib/pkg/jsonrpc => $temporary/jsonrpc
+replace github.com/faustbrian/go-router => $root
+replace github.com/faustbrian/go-service => $temporary/service
+replace github.com/faustbrian/go-http-middleware => $temporary/http-middleware
+replace github.com/faustbrian/go-jsonrpc => $temporary/jsonrpc
 EOF
 if [[ "${ROUTER_INTEGRATION_REMOTE_ONLY:-0}" != 1 ]]; then
   jq -r '
@@ -67,9 +67,9 @@ if [[ "${ROUTER_INTEGRATION_REMOTE_ONLY:-0}" != 1 ]]; then
   ' "$repository_root/modules.json" |
     while IFS=$'\t' read -r module_path module_directory; do
       case "$module_path" in
-        github.com/faustbrian/golib/pkg/http-middleware | \
-          github.com/faustbrian/golib/pkg/jsonrpc | \
-          github.com/faustbrian/golib/pkg/service)
+        github.com/faustbrian/go-http-middleware | \
+          github.com/faustbrian/go-jsonrpc | \
+          github.com/faustbrian/go-service)
           continue
           ;;
       esac
@@ -90,10 +90,10 @@ import (
   "strings"
   "testing"
 
-  middleware "github.com/faustbrian/golib/pkg/http-middleware"
-  jsonrpc "github.com/faustbrian/golib/pkg/jsonrpc"
-  router "github.com/faustbrian/golib/pkg/router"
-  "github.com/faustbrian/golib/pkg/service/serverhttp"
+  middleware "github.com/faustbrian/go-http-middleware"
+  jsonrpc "github.com/faustbrian/go-jsonrpc"
+  router "github.com/faustbrian/go-router"
+  "github.com/faustbrian/go-service/serverhttp"
 )
 
 func TestOwnedHTTPBoundaries(t *testing.T) {

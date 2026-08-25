@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	router "github.com/faustbrian/golib/pkg/router"
+	router "github.com/faustbrian/go-router"
 )
 
 func TestNestedGroupsFlattenComposition(t *testing.T) {

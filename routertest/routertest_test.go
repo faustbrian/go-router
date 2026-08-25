@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	router "github.com/faustbrian/golib/pkg/router"
-	"github.com/faustbrian/golib/pkg/router/routertest"
+	router "github.com/faustbrian/go-router"
+	"github.com/faustbrian/go-router/routertest"
 )
 
 func TestHelpersCompileServeAndAssert(t *testing.T) {

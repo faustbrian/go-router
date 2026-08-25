@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	router "github.com/faustbrian/golib/pkg/router"
+	router "github.com/faustbrian/go-router"
 )
 
 type recordingT struct {
