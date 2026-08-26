@@ -74,7 +74,7 @@ advisory NilAway. Each target is independently reproducible.
 
 MIT. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
-## Ecosystem
+## Documentation
 
-Use the [Golib documentation portal](https://github.com/faustbrian/golib/blob/main/docs/index.md)
-to choose companion packages, supported stacks, recipes, and operations guidance.
+Use the [documentation index](docs/README.md) for package-owned guides,
+operational contracts, examples, and maintainer references.

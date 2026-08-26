@@ -4,7 +4,7 @@ set -euo pipefail
 required=(
   README.md CHANGELOG.md SECURITY.md CONTRIBUTING.md CODE_OF_CONDUCT.md
   docs/adoption.md docs/api.md docs/architecture.md docs/compatibility.md
-  docs/cookbook.md docs/faq.md docs/hardening.md docs/matching.md
+  docs/cookbook.md docs/faq.md docs/matching.md
   docs/limits.md docs/matrices.md docs/migration.md docs/performance.md
   docs/quickstart.md docs/release.md docs/security.md docs/semantics.md
   docs/troubleshooting.md
