@@ -52,7 +52,11 @@
       "required_services": [],
       "build_tags": [],
       "test_tags": [],
-      "interoperability_tools": [],
+      "interoperability_tools": [
+        "go-http-middleware v1.0.0 owned integration",
+        "go-jsonrpc v1.0.0 owned integration",
+        "go-service v1.0.0 owned integration"
+      ],
       "specifications": [
         "Go 1.26.6 net/http and net/url contracts",
         "RFC 3986 URI Generic Syntax",

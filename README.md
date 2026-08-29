@@ -67,8 +67,9 @@ immutable `http.Handler` safe for concurrent serving and introspection.
 
 ## Development
 
-Run `make check` for the blocking local checks and `make check-all` to include
-advisory NilAway. Each target is independently reproducible.
+Run `make check` for the blocking local checks. NilAway remains visible as an
+advisory result in the shared contract. Each target is independently
+reproducible.
 
 ## License
 

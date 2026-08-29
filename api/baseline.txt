@@ -1,0 +1,267 @@
+package router // import "github.com/faustbrian/go-router"
+
+Package router provides explicit, immutable HTTP route composition on top of the
+standard net/http programming model.
+
+VARIABLES
+
+var (
+	// ErrInvalidRoute identifies a malformed route descriptor.
+	ErrInvalidRoute = errors.New("invalid route")
+	// ErrConflict identifies ambiguous or duplicate semantic routes.
+	ErrConflict = errors.New("route conflict")
+	// ErrDuplicateName identifies a repeated stable route name.
+	ErrDuplicateName = errors.New("duplicate route name")
+	// ErrInvalidParameter identifies malformed URL-generation parameters.
+	ErrInvalidParameter = errors.New("invalid route parameter")
+	// ErrGeneration identifies a named-route URL generation failure.
+	ErrGeneration = errors.New("route generation failed")
+	// ErrUnsupported identifies behavior deliberately unsupported by v1.
+	ErrUnsupported = errors.New("unsupported routing behavior")
+	// ErrCompileState identifies use of a builder after successful compilation.
+	ErrCompileState = errors.New("invalid router compile state")
+	// ErrLimitExceeded identifies a configured resource-budget violation.
+	ErrLimitExceeded = errors.New("router limit exceeded")
+)
+
+TYPES
+
+type BaseURL struct {
+	// Has unexported fields.
+}
+    BaseURL is an immutable validated absolute-URL base.
+
+func NewBaseURL(scheme, authority string) (BaseURL, error)
+    NewBaseURL validates and trusts one explicit HTTP or HTTPS authority.
+
+type Builder struct {
+	// Has unexported fields.
+}
+    Builder owns mutable startup-time registration state.
+
+func New(options ...Option) *Builder
+    New creates an empty single-owner route builder.
+
+func (b *Builder) Compile() (*Router, error)
+    Compile validates the complete route set and returns an immutable router.
+
+func (b *Builder) Group(options GroupOptions, define func(*Builder) error) error
+    Group transactionally flattens routes registered by define. If validation or
+    define fails, no route from the group is published to the parent.
+
+func (b *Builder) Mount(prefix string, handler http.Handler, options MountOptions) error
+    Mount registers handler below an explicit path boundary. The mount is one
+    ordinary remainder-wildcard route and therefore follows the active redirect
+    policy for a request missing the boundary's trailing slash.
+
+func (b *Builder) PendingRoutes() []Route
+    PendingRoutes returns copied descriptors registered before compilation.
+
+func (b *Builder) Register(route Route) error
+    Register validates and copies one route descriptor.
+
+type Error struct {
+	Kind   error
+	Field  string
+	Source string
+	Detail string
+}
+    Error is a bounded startup or generation diagnostic. Kind supports
+    errors.Is, while callers may use errors.As to inspect Field and Source.
+
+func (e *Error) Error() string
+    Error returns a deterministic diagnostic without request data or handlers.
+
+func (e *Error) Unwrap() error
+    Unwrap exposes the stable error category.
+
+type GroupOptions struct {
+	Host       string
+	PathPrefix string
+	NamePrefix string
+	Middleware []NamedMiddleware
+	Metadata   map[string]string
+}
+    GroupOptions composes a host, path and name prefix, middleware, and metadata
+    into every route registered by a group callback.
+
+type Limits struct {
+	MaxRoutes             int
+	MaxGroups             int
+	MaxGroupDepth         int
+	MaxMethodsPerRoute    int
+	MaxMethodBytes        int
+	MaxWildcardsPerRoute  int
+	MaxWildcardNameBytes  int
+	MaxPatternBytes       int
+	MaxHostBytes          int
+	MaxNameBytes          int
+	MaxSourceBytes        int
+	MaxOperationBytes     int
+	MaxDocumentationBytes int
+	MaxMetadataEntries    int
+	MaxMetadataKeyBytes   int
+	MaxMetadataValueBytes int
+	MaxMiddleware         int
+	MaxRequestTargetBytes int
+	MaxURLParameters      int
+	MaxURLParameterBytes  int
+	MaxQueryValues        int
+	MaxQueryBytes         int
+	MaxGeneratedURLBytes  int
+}
+    Limits bounds all construction and URL-generation inputs. Zero values are
+    invalid; start with DefaultLimits and adjust individual budgets.
+
+func DefaultLimits() Limits
+    DefaultLimits returns conservative production budgets.
+
+type Middleware = func(http.Handler) http.Handler
+    Middleware is the standard HTTP middleware shape.
+
+type MountOptions struct {
+	Name          string
+	Methods       []string
+	Host          string
+	Middleware    []NamedMiddleware
+	Metadata      map[string]string
+	Documentation string
+	Operation     string
+	Source        string
+	StripPrefix   bool
+}
+    MountOptions configures an explicit standard-handler mount.
+
+type NamedMiddleware struct {
+	Name       string
+	Middleware Middleware
+}
+    NamedMiddleware makes a middleware layer visible through introspection.
+    Name may be empty when exclusion and duplicate detection are not needed.
+
+type Option func(*Builder)
+    Option configures a Builder.
+
+func WithAutomaticOPTIONS(enabled bool) Option
+    WithAutomaticOPTIONS controls package-generated OPTIONS responses.
+
+func WithLimits(limits Limits) Option
+    WithLimits replaces all construction and generation limits.
+
+func WithMethodNotAllowed(handler http.Handler) Option
+    WithMethodNotAllowed replaces the minimal default 405 handler. The router
+    sets Allow before invoking it.
+
+func WithMiddleware(middleware ...NamedMiddleware) Option
+    WithMiddleware sets router-wide middleware in request execution order.
+
+func WithNotFound(handler http.Handler) Option
+    WithNotFound replaces the minimal default 404 handler.
+
+func WithRedirectPolicy(policy RedirectPolicy) Option
+    WithRedirectPolicy selects explicit canonical-path redirect behavior.
+
+type RedirectPolicy uint8
+    RedirectPolicy controls ServeMux canonical-path and subtree redirects.
+
+const (
+	// FollowRedirects preserves the standard ServeMux redirect behavior.
+	FollowRedirects RedirectPolicy = iota
+	// RejectRedirects treats a match requiring canonicalization as not found.
+	RejectRedirects
+)
+type Route struct {
+	Name              string
+	Methods           []string
+	Host              string
+	Path              string
+	Handler           http.Handler
+	Middleware        []NamedMiddleware
+	ExcludeMiddleware []string
+	Metadata          map[string]string
+	Documentation     string
+	Operation         string
+	Source            string
+}
+    Route is an explicit route descriptor. Builder.Register copies every slice
+    and map before retaining it.
+
+type RouteInfo struct {
+	Name          string
+	Methods       []string
+	Host          string
+	Pattern       string
+	Parameters    []string
+	Middleware    []string
+	Metadata      map[string]string
+	Documentation string
+	Operation     string
+	Source        string
+}
+    RouteInfo is a safe immutable view of a compiled route. Methods, Parameters,
+    Middleware, and Metadata are copied whenever information crosses the API.
+
+func MatchedRoute(request *http.Request) (RouteInfo, bool)
+    MatchedRoute returns the route selected for request, when called from its
+    handler or middleware chain.
+
+type Router struct {
+	// Has unexported fields.
+}
+    Router is an immutable concurrency-safe compiled HTTP handler.
+
+func (r *Router) Path(name string, parameters ...URLParameter) (string, error)
+    Path generates a relative escaped path for a named route. Host wildcard
+    values are intentionally not accepted by relative generation.
+
+func (r *Router) Routes() []RouteInfo
+    Routes returns the deterministic compiled route table.
+
+func (r *Router) ServeHTTP(writer http.ResponseWriter, request *http.Request)
+    ServeHTTP dispatches one request without mutating compiled state.
+
+func (r *Router) URL(name string, base BaseURL, query url.Values, parameters ...URLParameter) (string, error)
+    URL generates an absolute URL using a validated explicit base. A route host
+    replaces the base hostname while retaining its trusted explicit port.
+
+type URLParameter struct {
+	// Has unexported fields.
+}
+    URLParameter is an explicitly typed named-route generation input. Construct
+    values with Param or Remainder.
+
+func Param(name, value string) URLParameter
+    Param supplies one path segment or host label.
+
+func Remainder(name string, segments ...string) URLParameter
+    Remainder supplies explicit path segments for a remainder wildcard. Inputs
+    above the package hard ceiling are rejected during generation without being
+    copied.
+
+package routertest // import "github.com/faustbrian/go-router/routertest"
+
+Package routertest provides small consumer-facing helpers for compiled route
+tests without introducing a parallel runtime API.
+
+FUNCTIONS
+
+func AssertStatus(testingT TestingT, response *httptest.ResponseRecorder, expected int)
+    AssertStatus fails test when response does not contain expected.
+
+func MustCompile(testingT TestingT, builder *router.Builder) *router.Router
+    MustCompile compiles builder or fails test.
+
+func RouteTable(testingT TestingT, compiled *router.Router) []router.RouteInfo
+    RouteTable returns a copied compiled route table or fails for a nil router.
+
+func Serve(testingT TestingT, handler http.Handler, method, target string) *httptest.ResponseRecorder
+    Serve sends a bodyless request to handler and returns its recorder.
+
+
+TYPES
+
+type TestingT interface {
+	Helper()
+	Fatalf(format string, arguments ...any)
+}
+    TestingT is the subset of testing.TB used by the helpers.

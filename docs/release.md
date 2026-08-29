@@ -1,7 +1,7 @@
 # Release Process
 
 1. Update `CHANGELOG.md`, the API baseline, compatibility notes, and docs.
-2. Run `make check-all` with the pinned Go and tool versions.
+2. Run `make check` with the pinned Go and shared-tool versions.
 3. Review coverage, mutation output, vulnerability results, fuzz smoke,
    benchmarks, and integration evidence.
 4. Open and merge a reviewed pull request with every blocking workflow green.

@@ -7,9 +7,17 @@ Versioning.
 
 ## [Unreleased]
 
+### Changed
+
+- Adopt released `go-library-tools` v1.0.5 for local and GitHub Actions
+  verification while preserving router-specific conformance, integration,
+  API, fuzz, benchmark, and mutation evidence.
+- Replace copied repository tooling with the strict `.golib.yaml` contract and
+  the centralized immutable CI workflow.
+
 ### Documentation
 
-- Replace archived monorepo links and completed execution artifacts with a
+- Replace obsolete repository links and completed execution artifacts with a
   standalone, human-oriented documentation structure.
 
 ## [1.0.0] - 2026-08-25
