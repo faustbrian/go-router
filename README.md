@@ -67,14 +67,15 @@ immutable `http.Handler` safe for concurrent serving and introspection.
 
 ## Development
 
-Run `make check` for the blocking local checks and `make check-all` to include
-advisory NilAway. Each target is independently reproducible.
+Run `make check` for the blocking local checks. NilAway remains visible as an
+advisory result in the shared contract. Each target is independently
+reproducible.
 
 ## License
 
 MIT. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
-## Ecosystem
+## Documentation
 
-Use the [Golib documentation portal](https://github.com/faustbrian/golib/blob/main/docs/index.md)
-to choose companion packages, supported stacks, recipes, and operations guidance.
+Use the [documentation index](docs/README.md) for package-owned guides,
+operational contracts, examples, and maintainer references.

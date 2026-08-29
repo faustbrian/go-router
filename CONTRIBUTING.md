@@ -32,12 +32,16 @@ that hide a failing package.
 
 ## Verification
 
-Run during development:
+Run during development with the released shared tooling:
 
 ```bash
 make inventory
 make check
 ```
+
+The `golib` binary owns disposable Go caches, evidence reuse, gate thresholds,
+and package-specific typed operations. Do not restore repository-local tooling
+or bypass a failed gate.
 
 Before submitting a repository-wide change:
 
