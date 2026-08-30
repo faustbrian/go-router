@@ -1,0 +1,11 @@
+decision_id	peer_or_corpus	observed_behavior	classification	executable_evidence
+ROUTER-DEC-001	Go 1.26.6 http.ServeMux	Supported route patterns produce the same dispatch and path values.	maintained peer agreement	TestSupportedMatchingIsDifferentialWithServeMux
+ROUTER-DEC-002	Go 1.26.6 http.ServeMux	Controlled registration panics become typed compile errors without partial publication.	deliberate policy difference	TestCompileReturnsTypedConflictsAndFreezesOnlyOnSuccess
+ROUTER-DEC-003	Go 1.26.6 http.ServeMux	Default misses match ServeMux while enabled automatic OPTIONS is an explicit extension.	deliberate policy difference	TestDocumentedServeMuxDispatchDivergences
+ROUTER-DEC-004	Go 1.26.6 net/http request parsing	Origin and absolute forms dispatch while unsupported authority and asterisk forms are rejected.	deliberate policy difference	TestAsteriskOptionsAndMalformedAuthority
+ROUTER-DEC-005	Go 1.26.6 http.ServeMux	Default canonical redirects match ServeMux and the defensive rejection option preserves escaped structure.	deliberate policy difference	TestCanonicalRedirectsPrecedeRouteAndMethodSelection
+ROUTER-DEC-006	Go 1.26.6 http.ServeMux	Literal host matching is preserved while bounded single-label wildcards are a documented extension.	deliberate policy difference	TestSupportedMethodsAndLiteralHostsAreDifferentialWithServeMux
+ROUTER-DEC-009	Go 1.26.6 http.StripPrefix	Mount stripping uses a cloned URL and retains escaped suffix structure rather than mutating the caller request.	deliberate policy difference	TestMountStripsEscapedLiteralPrefixWithoutLosingRawPath
+ROUTER-DEC-010	Go 1.26.6 Request.PathValue	Path values remain on the standard request while route metadata is a bounded copied extension.	deliberate policy difference	TestCompiledRouterDispatchesWithPathValuesAndMatchedRoute
+ROUTER-DEC-011	Go 1.26.6 net/url and http.ServeMux	Generated segment values round-trip through ServeMux without structural injection.	maintained peer agreement	TestNamedPathGenerationEscapesSegmentsAndRoundTrips
+ROUTER-DEC-012	Go 1.26.6 net/url	Absolute URLs use explicit validated bases and never infer proxy or request authority.	deliberate policy difference	TestAbsoluteURLGenerationValidatesBaseHostAndQuery
