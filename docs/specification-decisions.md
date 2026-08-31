@@ -250,7 +250,7 @@ Authority URL: https://go.dev/src/net/http/server.go?m=text
   ],
   "public_apis": [
     "Router.ServeHTTP",
-    "WithAutomaticOptions"
+    "WithAutomaticOPTIONS"
   ],
   "documentation": [
     "docs/specification-decisions.md"
@@ -1111,8 +1111,8 @@ Authority URL: https://www.rfc-editor.org/rfc/rfc3986.txt
   "public_apis": [
     "Limits",
     "Error",
-    "WithNotFoundHandler",
-    "WithMethodNotAllowedHandler"
+    "WithNotFound",
+    "WithMethodNotAllowed"
   ],
   "documentation": [
     "docs/specification-decisions.md"

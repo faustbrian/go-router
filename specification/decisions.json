@@ -94,7 +94,7 @@
       "fixture_evidence": ["router_test.go"],
       "fuzz_evidence": ["FuzzRequestTargets"],
       "interoperability_evidence": ["specification/interoperability.tsv"],
-      "public_apis": ["Router.ServeHTTP", "WithAutomaticOptions"],
+      "public_apis": ["Router.ServeHTTP", "WithAutomaticOPTIONS"],
       "documentation": ["docs/specification-decisions.md"],
       "upstream_status": "RFC 9110 intentionally leaves router automation policy unspecified.",
       "reconsider_when": "A versioned compatibility change selects different method or OPTIONS behavior."
@@ -394,7 +394,7 @@
       "fixture_evidence": ["builder_test.go"],
       "fuzz_evidence": ["FuzzRoutePatternCompilation", "FuzzURLGenerationInputs"],
       "interoperability_evidence": [],
-      "public_apis": ["Limits", "Error", "WithNotFoundHandler", "WithMethodNotAllowedHandler"],
+      "public_apis": ["Limits", "Error", "WithNotFound", "WithMethodNotAllowed"],
       "documentation": ["docs/specification-decisions.md"],
       "upstream_status": "RFC 9110 defines 414 but leaves router resource and custom-handler policy unspecified.",
       "reconsider_when": "Measured compatibility or resource evidence justifies a versioned limit change."
