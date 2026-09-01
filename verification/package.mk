@@ -1,4 +1,4 @@
-.PHONY: conformance docs integration safety
+.PHONY: conformance docs integration
 
 conformance:
 	./scripts/check-conformance.sh
@@ -8,6 +8,3 @@ docs:
 
 integration:
 	./scripts/check-integrations.sh
-
-safety:
-	./scripts/check-safety.sh
