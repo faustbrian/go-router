@@ -1,6 +1,6 @@
 schema_version: 1
-tool_version: v1.0.14
-tool_checksums_sha256: 88341d2f2904925b22ec8de084fec68c5229669f1119f066ed5fccd76aee2f82
+tool_version: v1.2.0
+tool_checksums_sha256: 7de6de3a14184eced8c0114bf802cb24a808f3e1592d358f6f6f3d02552d0e27
 
 manifest:
   modules: modules.json
@@ -27,6 +27,27 @@ api:
 
 operations:
   - module: .
+    gate: docs
+    steps:
+      - type: make
+        makefile: verification/package.mk
+        target: docs
+        timeout: 20m
+  - module: .
+    gate: test
+    steps:
+      - type: make
+        makefile: verification/package.mk
+        target: safety
+        timeout: 20m
+  - module: .
+    gate: interoperability
+    steps:
+      - type: make
+        makefile: verification/package.mk
+        target: integration
+        timeout: 20m
+  - module: .
     gate: conformance
     steps:
       - type: make
@@ -34,42 +55,35 @@ operations:
         target: conformance
         timeout: 20m
   - module: .
-    gate: interoperability
-    steps:
-      - type: make
-        makefile: verification/package.mk
-        target: interoperability
-        timeout: 20m
-  - module: .
     gate: fuzz
     steps:
       - type: go-test
-        packages: ["."]
+        packages: [.]
         fuzz: '^FuzzRoutePatternCompilation$'
         budget: 2s
         timeout: 2m
       - type: go-test
-        packages: ["."]
+        packages: [.]
         fuzz: '^FuzzNamedRouteRoundTrip$'
         budget: 2s
         timeout: 2m
       - type: go-test
-        packages: ["."]
+        packages: [.]
         fuzz: '^FuzzRequestTargets$'
         budget: 2s
         timeout: 2m
       - type: go-test
-        packages: ["."]
+        packages: [.]
         fuzz: '^FuzzHostMatching$'
         budget: 2s
         timeout: 2m
       - type: go-test
-        packages: ["."]
+        packages: [.]
         fuzz: '^FuzzGroupComposition$'
         budget: 2s
         timeout: 2m
       - type: go-test
-        packages: ["."]
+        packages: [.]
         fuzz: '^FuzzURLGenerationInputs$'
         budget: 2s
         timeout: 2m
@@ -77,7 +91,7 @@ operations:
     gate: benchmark
     steps:
       - type: go-test
-        packages: ["./..."]
-        benchmark: "."
+        packages: [./...]
+        benchmark: .
         budget: 100ms
         timeout: 20m

@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "decisions": [
+    {
+      "id": "ROUTER-DEC-001",
+      "authoritative_sources": ["go-net-http"],
+      "executable_evidence": ["TestSupportedMatchingIsDifferentialWithServeMux", "TestSupportedMethodsAndLiteralHostsAreDifferentialWithServeMux"],
+      "fixtures": ["compatibility_security_test.go"],
+      "fuzz": ["FuzzRoutePatternCompilation"],
+      "differential_evidence": ["specification/interoperability.tsv"],
+      "differential_classification": "maintained peer agreement",
+      "public_behavior": ["Supported patterns use Go 1.26.6 ServeMux matching, precedence, redirects, and path values."]
+    },
+    {
+      "id": "ROUTER-DEC-002",
+      "authoritative_sources": ["go-net-http"],
+      "executable_evidence": ["TestCompileReturnsTypedConflictsAndFreezesOnlyOnSuccess", "TestConflictFailureDoesNotConstructAnyMiddleware", "TestRegistrationOrderDoesNotChangeDispatchOrIntrospection", "TestPatternValidationPropagatesUncontrolledPanics"],
+      "fixtures": ["router_test.go"],
+      "fuzz": ["FuzzRoutePatternCompilation"],
+      "differential_evidence": ["specification/interoperability.tsv"],
+      "differential_classification": "deliberate policy difference",
+      "public_behavior": ["Controlled registration failures return typed errors without partial publication."]
+    },
+    {
+      "id": "ROUTER-DEC-003",
+      "authoritative_sources": ["rfc9110"],
+      "executable_evidence": ["TestCompiledRouterPreservesHTTPMethodSemantics", "TestExplicitOptionsAndHeadRoutesWin", "TestDefaultNotFoundAndMethodNotAllowedMatchServeMux", "TestDocumentedServeMuxDispatchDivergences"],
+      "fixtures": ["router_test.go"],
+      "fuzz": ["FuzzRequestTargets"],
+      "differential_evidence": ["specification/interoperability.tsv"],
+      "differential_classification": "deliberate policy difference",
+      "public_behavior": ["Method dispatch, implied HEAD, optional automatic OPTIONS, Allow, 405, and 501 outcomes follow the registered policy."]
+    },
+    {
+      "id": "ROUTER-DEC-004",
+      "authoritative_sources": ["rfc9112"],
+      "executable_evidence": ["TestAsteriskOptionsAndMalformedAuthority", "TestMalformedRequestsBypassCustomHandlersAndRouteMiddleware", "TestUnsupportedConnectRouteFailsAtStartup"],
+      "fixtures": ["compatibility_security_test.go"],
+      "fuzz": ["FuzzRequestTargets"],
+      "differential_evidence": ["specification/interoperability.tsv"],
+      "differential_classification": "deliberate policy difference",
+      "public_behavior": ["Origin and absolute targets dispatch, OPTIONS asterisk is explicit, and unsupported forms fail before middleware."]
+    },
+    {
+      "id": "ROUTER-DEC-005",
+      "authoritative_sources": ["go-net-http"],
+      "executable_evidence": ["TestCanonicalRedirectsPrecedeRouteAndMethodSelection", "TestRejectRedirectPolicyTreatsEncodedSeparatorsAsWildcardData", "TestRejectRedirectPolicyRejectsSemanticSubtreeRoots"],
+      "fixtures": ["compatibility_security_test.go"],
+      "fuzz": ["FuzzRequestTargets"],
+      "differential_evidence": ["specification/interoperability.tsv"],
+      "differential_classification": "deliberate policy difference",
+      "public_behavior": ["ServeMux redirects run by default and RejectRedirects classifies structure from escaped paths."]
+    },
+    {
+      "id": "ROUTER-DEC-006",
+      "authoritative_sources": ["rfc9110"],
+      "executable_evidence": ["TestHostPatternsMatchPortsAndSingleLabels", "TestHostSpecificityFallbackAndEquivalentPatterns", "TestAmbiguousHostPatternsAndUnsafeAuthoritiesAreRejected"],
+      "fixtures": ["compatibility_security_test.go"],
+      "fuzz": ["FuzzHostMatching"],
+      "differential_evidence": ["specification/interoperability.tsv"],
+      "differential_classification": "deliberate policy difference",
+      "public_behavior": ["Validated ASCII host patterns ignore request ports and use exact, wildcard, then hostless precedence."]
+    },
+    {
+      "id": "ROUTER-DEC-007",
+      "authoritative_sources": ["go-net-http"],
+      "executable_evidence": ["TestNestedGroupsFlattenComposition", "TestGroupCompositionRejectsInvalidAndPartialState", "TestNestedGroupPrefixesUseComposedBudgets"],
+      "fixtures": ["group_test.go"],
+      "fuzz": ["FuzzGroupComposition"],
+      "differential_evidence": [],
+      "differential_classification": "not assessed",
+      "public_behavior": ["Nested groups flatten transactionally without path cleaning or partial publication."]
+    },
+    {
+      "id": "ROUTER-DEC-008",
+      "authoritative_sources": ["go-net-http"],
+      "executable_evidence": ["TestMiddlewareOrderAndIntrospectionAreStableAndImmutable", "TestRouteMayExcludeNamedGroupMiddleware", "TestMiddlewareMayShortCircuitPanicCancelAndReenter", "TestRouterPreservesResponseWriterOptionalInterfaces"],
+      "fixtures": ["middleware_hardening_test.go"],
+      "fuzz": ["FuzzGroupComposition"],
+      "differential_evidence": [],
+      "differential_classification": "not assessed",
+      "public_behavior": ["Middleware order and exclusions are deterministic while runtime handler ownership stays with callers."]
+    },
+    {
+      "id": "ROUTER-DEC-009",
+      "authoritative_sources": ["go-net-http"],
+      "executable_evidence": ["TestMountStripsPathOnCloneAndPreservesRequestTarget", "TestMountStripsEscapedLiteralPrefixWithoutLosingRawPath", "TestCompiledRouterMountIsAnOrdinaryHandler"],
+      "fixtures": ["mount_policy_test.go"],
+      "fuzz": ["FuzzRequestTargets"],
+      "differential_evidence": ["specification/interoperability.tsv"],
+      "differential_classification": "deliberate policy difference",
+      "public_behavior": ["Mount stripping clones URL state, preserves escaped suffixes, and leaves the caller request unchanged."]
+    },
+    {
+      "id": "ROUTER-DEC-010",
+      "authoritative_sources": ["go-net-http-request"],
+      "executable_evidence": ["TestCompiledRouterDispatchesWithPathValuesAndMatchedRoute", "TestMiddlewareOrderAndIntrospectionAreStableAndImmutable", "TestConcurrentDispatchIntrospectionAndGeneration"],
+      "fixtures": ["router_test.go"],
+      "fuzz": ["FuzzRoutePatternCompilation"],
+      "differential_evidence": ["specification/interoperability.tsv"],
+      "differential_classification": "deliberate policy difference",
+      "public_behavior": ["Handlers use Request.PathValue and selected chains receive copied bounded route metadata."]
+    },
+    {
+      "id": "ROUTER-DEC-011",
+      "authoritative_sources": ["rfc3986"],
+      "executable_evidence": ["TestNamedPathGenerationEscapesSegmentsAndRoundTrips", "TestRemainderGenerationRequiresExplicitSafeSegments", "TestGenerationRejectsParameterSetErrors"],
+      "fixtures": ["generation_test.go"],
+      "fuzz": ["FuzzNamedRouteRoundTrip"],
+      "differential_evidence": ["specification/interoperability.tsv"],
+      "differential_classification": "maintained peer agreement",
+      "public_behavior": ["Typed named-route parameters are escaped once and round-trip through ServeMux path values."]
+    },
+    {
+      "id": "ROUTER-DEC-012",
+      "authoritative_sources": ["rfc3986"],
+      "executable_evidence": ["TestAbsoluteURLGenerationValidatesBaseHostAndQuery", "TestGenerationEnforcesOutputAndQueryLimits", "TestTrustedBaseAuthorityIsBounded"],
+      "fixtures": ["generation_test.go"],
+      "fuzz": ["FuzzURLGenerationInputs"],
+      "differential_evidence": ["specification/interoperability.tsv"],
+      "differential_classification": "deliberate policy difference",
+      "public_behavior": ["Absolute URL generation uses explicit validated HTTP or HTTPS bases and no ambient request authority."]
+    },
+    {
+      "id": "ROUTER-DEC-013",
+      "authoritative_sources": ["rfc9110"],
+      "executable_evidence": ["TestRegisterEnforcesLimitsAndBoundsDiagnostics", "TestFineGrainedInputByteBudgets", "TestDiagnosticsAreSingleLineValidUTF8", "TestCustomErrorHandlerOwnsPartialResponsesAndPanics", "TestEveryLimitMustBePositive"],
+      "fixtures": ["builder_test.go"],
+      "fuzz": ["FuzzRoutePatternCompilation", "FuzzURLGenerationInputs"],
+      "differential_evidence": [],
+      "differential_classification": "not assessed",
+      "public_behavior": ["Finite limits, typed diagnostics, and custom miss-handler ownership are enforced at exact boundaries."]
+    }
+  ]
+}
