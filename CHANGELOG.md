@@ -9,15 +9,38 @@ Versioning.
 
 ### Changed
 
-- Adopt released `go-library-tools` v1.0.5 for local and GitHub Actions
-  verification while preserving router-specific conformance, integration,
-  API, fuzz, benchmark, and mutation evidence.
-- Replace copied repository tooling with the strict `.golib.yaml` contract and
-  the centralized immutable CI workflow.
+- Replace copied repository tooling with the checksum-pinned
+  `go-library-tools` v1.2.0 specification-governance contract while retaining
+  package-owned policy and verification evidence.
+- Pin CI to the immutable shared-tooling revision that enforces the structured
+  specification decision, conformance, history, and monitoring contract.
+- Expose the owned middleware, JSON-RPC, and service integrations through the
+  typed interoperability gate required by the repository contract.
 
 ### Documentation
 
-- Replace obsolete repository links and completed execution artifacts with a
+- Make the [specification decision register](docs/specification-decisions.md)
+  machine-auditable with monitored source and errata authorities, attributable
+  conformance evidence, classified interoperability results, and durable
+  decision history.
+
+  - ROUTER-DEC-001 sha256:56f4ea57efd1fb24b8650c883bea47f05872c63d6fb4f4fb43f1f2bdafe9ff8c
+  - ROUTER-DEC-002 sha256:f8dbfe4fe493cc3b71c400f985206aef6654f266f705ff0a6f8fdbb9fd979811
+  - ROUTER-DEC-003 sha256:e57444cf3c6e408a366c339ed4f622897c655ccf85dfa6545628d07e04cd5964
+  - ROUTER-DEC-003 sha256:131ba5fada36d81eb47b1d595b624ee2cf0b95e6cfdfde47409b8492e156d2f3
+  - ROUTER-DEC-004 sha256:d06af40fb0a74ae46f2f22d843c09effd2c397777bf07d2a9f931fdec3e9efb2
+  - ROUTER-DEC-005 sha256:383d99f58bc5bf65b234941feb386c096b673e5276e45cba86aa31e5d80971e9
+  - ROUTER-DEC-006 sha256:9fa23204c8ff2ae12d5631c7947091b32436be3bf075a29f2700037a7bce27c1
+  - ROUTER-DEC-007 sha256:1eb13de30f37d6bc1e8e7924ace29a967364d88f22570ca7cc84f2c5659e9139
+  - ROUTER-DEC-008 sha256:bcf6f5c4c6b7b3960e028c33645cedbb22dcfab2d7460d2acee73077edee2c2b
+  - ROUTER-DEC-009 sha256:d9b4e24c30bcd894c78acf8b92d8bea117053a186f64b34cdb98bd6f24a5cc50
+  - ROUTER-DEC-010 sha256:b5d8f22178d8134c9f8d51926982579efddbd5f06abe7e73ed3bbb323718d4a7
+  - ROUTER-DEC-011 sha256:344c1ed6825f17af34fc9ed9be101d2bf730a2ce7efd316091f28cc505b14bc1
+  - ROUTER-DEC-012 sha256:061923f106754b9924c7895baeb6aaba09b137e011f365f227d1be701641c513
+  - ROUTER-DEC-013 sha256:a016415608cdc167fa9420223fd33a537d5594acef8d03d5d0dc90fe658d42ce
+  - ROUTER-DEC-013 sha256:2c3dc12f61f2cfd486dcf93fc8a264758733eb61b13a0249920c06778fe81317
+
+- Replace archived monorepo links and completed execution artifacts with a
   standalone, human-oriented documentation structure.
 
 ## [1.0.0] - 2026-08-25

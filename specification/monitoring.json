@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-08-30",
+  "review_interval_days": 90,
+  "authorities": [
+    {
+      "id": "go-net-http",
+      "kind": "specification",
+      "version": "Go 1.26.6",
+      "url": "https://go.dev/src/net/http/server.go?m=text",
+      "sha256": "8a46dd48f65aba824366170f8f335417af263fc60b7b4e04ef2a4bba4a21253d",
+      "specifications": ["Go 1.26.6 net/http and net/url contracts"]
+    },
+    {
+      "id": "go-net-http-request",
+      "kind": "specification",
+      "version": "Go 1.26.6",
+      "url": "https://go.dev/src/net/http/request.go?m=text",
+      "sha256": "c3257079994b4e4f74f01cef72508919983ba31f91fcf599d348e9d52cec1540",
+      "specifications": ["Go 1.26.6 net/http and net/url contracts"]
+    },
+    {
+      "id": "go-net-url",
+      "kind": "specification",
+      "version": "Go 1.26.6",
+      "url": "https://go.dev/src/net/url/url.go?m=text",
+      "sha256": "44c33f88526abf3b5955d6c97297be5c9d228e741b33e52c940dcac5a496e091",
+      "specifications": ["Go 1.26.6 net/http and net/url contracts"]
+    },
+    {
+      "id": "go-releases",
+      "kind": "releases",
+      "version": "",
+      "url": "https://go.dev/dl/?mode=json&include=all",
+      "sha256": "c0696d6e5708cce9644204513ee4ecb994f3fd748065c54b0890158c34631207",
+      "specifications": ["Go 1.26.6 net/http and net/url contracts"]
+    },
+    {
+      "id": "rfc3986",
+      "kind": "specification",
+      "version": "RFC 3986",
+      "url": "https://www.rfc-editor.org/rfc/rfc3986.txt",
+      "sha256": "3102dae4b68cebe40337730312fcb612297b8928547267e8b3d1ee6002b2d683",
+      "specifications": ["RFC 3986 URI Generic Syntax"]
+    },
+    {
+      "id": "rfc3986-errata",
+      "kind": "errata",
+      "version": "",
+      "url": "https://errata.rfc-editor.org/search/?rfc_number=3986&presentation=records",
+      "sha256": "14c0668758374a5cc14cf248292c31f694e6d420f43e135e0fe02427f145b06a",
+      "specifications": ["RFC 3986 URI Generic Syntax"]
+    },
+    {
+      "id": "rfc9110",
+      "kind": "specification",
+      "version": "RFC 9110",
+      "url": "https://www.rfc-editor.org/rfc/rfc9110.txt",
+      "sha256": "21c1cdce6ab0e5509b04d84a28000836c7a087cf786efe6f04877ebfff47232a",
+      "specifications": ["RFC 9110 HTTP Semantics"]
+    },
+    {
+      "id": "rfc9110-errata",
+      "kind": "errata",
+      "version": "",
+      "url": "https://errata.rfc-editor.org/search/?rfc_number=9110&presentation=records",
+      "sha256": "38bd006c96f8963d58573f704c5313a5f81968b90738c03ade0b036ec7bbdf4b",
+      "specifications": ["RFC 9110 HTTP Semantics"]
+    },
+    {
+      "id": "rfc9112",
+      "kind": "specification",
+      "version": "RFC 9112",
+      "url": "https://www.rfc-editor.org/rfc/rfc9112.txt",
+      "sha256": "e4f426bac6206b67fdf9e0da826154f70588db2133a0a86b15cde4ff725d8937",
+      "specifications": ["RFC 9112 HTTP/1.1 request-target forms"]
+    },
+    {
+      "id": "rfc9112-errata",
+      "kind": "errata",
+      "version": "",
+      "url": "https://errata.rfc-editor.org/search/?rfc_number=9112&presentation=records",
+      "sha256": "a5ae806691a53451d26294166e69b73b87af747db0a1949416e52b0d22e9906e",
+      "specifications": ["RFC 9112 HTTP/1.1 request-target forms"]
+    }
+  ]
+}

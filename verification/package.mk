@@ -1,7 +1,10 @@
-.PHONY: conformance interoperability
+.PHONY: conformance docs integration
 
 conformance:
 	./scripts/check-conformance.sh
 
-interoperability:
+docs:
+	./scripts/check-docs.sh
+
+integration:
 	./scripts/check-integrations.sh
