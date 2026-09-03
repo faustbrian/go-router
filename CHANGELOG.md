@@ -16,6 +16,11 @@ Versioning.
   specification decision, conformance, history, and monitoring contract.
 - Expose the owned middleware, JSON-RPC, and service integrations through the
   typed interoperability gate required by the repository contract.
+- Adopt the checksum-verified `go-library-tools` v1.3.0 CLI, schema-v2
+  cohesion metadata, and repository-local cohesion gate while retaining the
+  router's public API and package-owned verification evidence.
+- Pin reusable CI to the immutable v1.3.0 workflow so hosted checks enforce
+  the same cohesion contract as local validation.
 
 ### Documentation
 
@@ -42,6 +47,8 @@ Versioning.
 
 - Replace archived monorepo links and completed execution artifacts with a
   standalone, human-oriented documentation structure.
+- Link the router to the immutable v1.3.0 Golib ecosystem index and
+  service-edge package-selection guidance.
 
 ## [1.0.0] - 2026-08-25
 
