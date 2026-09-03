@@ -4,12 +4,12 @@
     {
       "id": "ROUTER-DEC-001",
       "authoritative_sources": ["go-net-http"],
-      "executable_evidence": ["TestSupportedMatchingIsDifferentialWithServeMux", "TestSupportedMethodsAndLiteralHostsAreDifferentialWithServeMux"],
+      "executable_evidence": ["TestSupportedMatchingIsDifferentialWithServeMux", "TestSupportedMethodsAndLiteralHostsAreDifferentialWithServeMux", "TestPinnedServeMuxRedirectsPreserveGo126EscapedPathBehavior"],
       "fixtures": ["compatibility_security_test.go"],
       "fuzz": ["FuzzRoutePatternCompilation"],
       "differential_evidence": ["specification/interoperability.tsv"],
       "differential_classification": "maintained peer agreement",
-      "public_behavior": ["Supported patterns use Go 1.26.6 ServeMux matching, precedence, redirects, and path values."]
+      "public_behavior": ["Supported patterns use Go 1.26.6 ServeMux matching, precedence, redirect serialization, and path values across supported toolchains."]
     },
     {
       "id": "ROUTER-DEC-002",
@@ -44,12 +44,12 @@
     {
       "id": "ROUTER-DEC-005",
       "authoritative_sources": ["go-net-http"],
-      "executable_evidence": ["TestCanonicalRedirectsPrecedeRouteAndMethodSelection", "TestRejectRedirectPolicyTreatsEncodedSeparatorsAsWildcardData", "TestRejectRedirectPolicyRejectsSemanticSubtreeRoots"],
+      "executable_evidence": ["TestCanonicalRedirectsPrecedeRouteAndMethodSelection", "TestPinnedServeMuxRedirectsPreserveGo126EscapedPathBehavior", "TestPinnedSubtreeRedirectDoesNotOverrideExplicitRoot", "TestRejectRedirectPolicyTreatsEncodedSeparatorsAsWildcardData", "TestRejectRedirectPolicyRejectsSemanticSubtreeRoots"],
       "fixtures": ["compatibility_security_test.go"],
       "fuzz": ["FuzzRequestTargets"],
       "differential_evidence": ["specification/interoperability.tsv"],
       "differential_classification": "deliberate policy difference",
-      "public_behavior": ["ServeMux redirects run by default and RejectRedirects classifies structure from escaped paths."]
+      "public_behavior": ["Go 1.26.6 ServeMux redirect serialization runs by default across supported toolchains and RejectRedirects classifies structure from escaped paths."]
     },
     {
       "id": "ROUTER-DEC-006",

@@ -49,7 +49,6 @@ func (b *Builder) Compile() (*Router, error) {
 		methodNotAllowed: b.methodNotAllowed,
 		automaticOptions: b.automaticOptions,
 		redirectPolicy:   b.redirectPolicy,
-		canonicalizer:    http.NewServeMux(),
 	}
 	hostIndexes := make(map[string]int)
 	for _, route := range routes {

@@ -22,12 +22,14 @@ Superseded decisions remain linked from their replacements.
 - **Selected behavior, security and resource consequences, compatibility and wire consequences:**
   Delegate supported literal,
   `{name}`, `{name...}`, and `{$}` path parsing, specificity, conflict,
-  extraction, GET-to-HEAD, and redirects to the pinned `ServeMux`. Package
-  extensions operate outside that matcher; no copied internal source, unsafe,
-  or registration-order tie-break exists.
+  extraction, and GET-to-HEAD behavior to `ServeMux`. Canonical and subtree
+  redirect locations preserve the pinned Go 1.26.6 serialization across later
+  toolchains. Package extensions operate outside the matcher; no copied matcher,
+  unsafe, or registration-order tie-break exists.
 - **Evidence, public surface, upstream, and reconsideration:**
   `TestSupportedMatchingIsDifferentialWithServeMux`,
   `TestSupportedMethodsAndLiteralHostsAreDifferentialWithServeMux`, and
+  `TestPinnedServeMuxRedirectsPreserveGo126EscapedPathBehavior` plus
   `FuzzRoutePatternCompilation` cover `Builder.Register`, `Compile`, and
   `Router.ServeHTTP`. Reconsider when the minimum Go routing contract changes.
 
@@ -55,15 +57,16 @@ Superseded decisions remain linked from their replacements.
     "Support literal paths only"
   ],
   "peer_behavior": "Go 1.26.6 ServeMux is the maintained differential peer for supported precedence, escaped segments, redirects, and path-value extraction.",
-  "selected_behavior": "Delegate supported literal, named wildcard, remainder wildcard, and end-marker parsing, specificity, conflicts, path values, GET-to-HEAD matching, and redirects to Go 1.26.6 ServeMux.",
-  "rationale": "Delegation preserves the declared Go contract and avoids an unreviewed parallel matcher.",
+  "selected_behavior": "Delegate supported literal, named wildcard, remainder wildcard, and end-marker parsing, specificity, conflicts, path values, and GET-to-HEAD matching to ServeMux while preserving Go 1.26.6 canonical and subtree redirect serialization across later toolchains.",
+  "rationale": "Delegation preserves the declared matching contract without an unreviewed parallel matcher, while a narrow redirect boundary prevents later toolchains from silently changing the pinned wire behavior.",
   "security_consequences": "No copied unsafe matcher or registration-order tie-break can reinterpret escaped path structure.",
   "resource_consequences": "ServeMux owns matcher construction and dispatch within the router's finite registration and request limits.",
   "compatibility_consequences": "Supported patterns track the pinned Go 1.26.6 contract; package extensions remain explicitly separate.",
-  "wire_consequences": "Dispatch, redirects, and extracted path values match ServeMux for the supported surface.",
+  "wire_consequences": "Dispatch and extracted path values match ServeMux for the supported surface, and redirect locations retain Go 1.26.6 escaped-path serialization.",
   "executable_evidence": [
     "TestSupportedMatchingIsDifferentialWithServeMux",
-    "TestSupportedMethodsAndLiteralHostsAreDifferentialWithServeMux"
+    "TestSupportedMethodsAndLiteralHostsAreDifferentialWithServeMux",
+    "TestPinnedServeMuxRedirectsPreserveGo126EscapedPathBehavior"
   ],
   "fixture_evidence": [
     "compatibility_security_test.go"
@@ -87,7 +90,7 @@ Superseded decisions remain linked from their replacements.
 }
 ```
 
-Authority URL: https://go.dev/src/net/http/server.go?m=text
+Authority URL: https://raw.githubusercontent.com/golang/go/go1.26.6/src/net/http/server.go
 
 </details>
 
@@ -173,7 +176,7 @@ Authority URL: https://go.dev/src/net/http/server.go?m=text
 }
 ```
 
-Authority URL: https://go.dev/src/net/http/server.go?m=text
+Authority URL: https://raw.githubusercontent.com/golang/go/go1.26.6/src/net/http/server.go
 
 </details>
 
@@ -361,17 +364,20 @@ Authority URL: https://www.rfc-editor.org/rfc/rfc9112.txt
   disable all canonicalization, clean decoded paths, or classify structural
   changes using escaped paths. Routers disagree on `%2F` and trailing slash.
 - **Selected behavior, security and resource consequences, compatibility and wire consequences:**
-  Follow ServeMux canonical and subtree
-  redirects by default before route/method miss selection. `RejectRedirects`
-  converts structural redirects to 404 using escaped-path semantics and
-  standard patterns. Encoded separators and dot text inside a wildcard remain
-  data; literal and percent-encoded dot segments in registered patterns are
-  rejected.
+  Follow Go 1.26.6 ServeMux canonical and subtree redirects by default before
+  route/method miss selection, preserving that version's Location serialization
+  on later toolchains. `RejectRedirects` converts structural redirects to 404
+  using escaped-path semantics and standard patterns. Encoded separators and
+  dot text inside a wildcard remain data; literal and percent-encoded dot
+  segments in registered patterns are rejected.
 - **Evidence, public surface, upstream, and reconsideration:**
   `TestCanonicalRedirectsPrecedeRouteAndMethodSelection`,
+  `TestPinnedServeMuxRedirectsPreserveGo126EscapedPathBehavior`,
+  `TestPinnedSubtreeRedirectDoesNotOverrideExplicitRoot`,
   `TestRejectRedirectPolicyTreatsEncodedSeparatorsAsWildcardData`, and
   `TestRejectRedirectPolicyRejectsSemanticSubtreeRoots` cover `RedirectPolicy`.
-  Reconsider when Go canonicalization behavior changes.
+  Reconsider when the minimum Go version changes or a versioned compatibility
+  decision adopts newer redirect serialization.
 
 <details>
 <summary>Machine-auditable decision record</summary>
@@ -397,14 +403,16 @@ Authority URL: https://www.rfc-editor.org/rfc/rfc9112.txt
     "Classify structural changes using escaped paths"
   ],
   "peer_behavior": "Go 1.26.6 ServeMux is the maintained differential peer for canonical redirects, escaped slashes, dot segments, and subtree roots.",
-  "selected_behavior": "Follow ServeMux canonical and subtree redirects by default before miss selection; when RejectRedirects is selected, convert structural redirects to 404 using escaped-path semantics while keeping encoded separators and dot text inside wildcards as data.",
-  "rationale": "Default delegation preserves Go behavior and escaped-path classification prevents encoded data from becoming false structure.",
+  "selected_behavior": "Follow Go 1.26.6 ServeMux canonical and subtree redirects by default before miss selection, preserving that version's redirect serialization across later toolchains; when RejectRedirects is selected, convert structural redirects to 404 using escaped-path semantics while keeping encoded separators and dot text inside wildcards as data.",
+  "rationale": "Pinned redirect serialization prevents toolchain upgrades from silently changing Location values, and escaped-path classification prevents encoded data from becoming false structure.",
   "security_consequences": "Literal and percent-encoded dot segments in registered patterns are rejected and encoded separators cannot bypass structural checks.",
   "resource_consequences": "Redirect classification uses bounded request and pattern data.",
-  "compatibility_consequences": "FollowRedirects remains ServeMux-compatible; RejectRedirects is an explicit defensive divergence.",
-  "wire_consequences": "Canonical requests redirect by default or return 404 under the explicit rejection policy.",
+  "compatibility_consequences": "FollowRedirects remains compatible with the pinned Go 1.26.6 ServeMux behavior on every supported toolchain; RejectRedirects is an explicit defensive divergence.",
+  "wire_consequences": "Canonical requests use Go 1.26.6 redirect locations by default or return 404 under the explicit rejection policy.",
   "executable_evidence": [
     "TestCanonicalRedirectsPrecedeRouteAndMethodSelection",
+    "TestPinnedServeMuxRedirectsPreserveGo126EscapedPathBehavior",
+    "TestPinnedSubtreeRedirectDoesNotOverrideExplicitRoot",
     "TestRejectRedirectPolicyTreatsEncodedSeparatorsAsWildcardData",
     "TestRejectRedirectPolicyRejectsSemanticSubtreeRoots"
   ],
@@ -425,11 +433,11 @@ Authority URL: https://www.rfc-editor.org/rfc/rfc9112.txt
     "docs/specification-decisions.md"
   ],
   "upstream_status": "Go 1.26.6 ServeMux is the redirect-behavior authority.",
-  "reconsider_when": "Go canonicalization behavior changes."
+  "reconsider_when": "The minimum supported Go version changes or a versioned compatibility decision adopts newer redirect serialization."
 }
 ```
 
-Authority URL: https://go.dev/src/net/http/server.go?m=text
+Authority URL: https://raw.githubusercontent.com/golang/go/go1.26.6/src/net/http/server.go
 
 </details>
 
@@ -601,7 +609,7 @@ Authority URL: https://www.rfc-editor.org/rfc/rfc9110.txt
 }
 ```
 
-Authority URL: https://go.dev/src/net/http/server.go?m=text
+Authority URL: https://raw.githubusercontent.com/golang/go/go1.26.6/src/net/http/server.go
 
 </details>
 
@@ -688,7 +696,7 @@ Authority URL: https://go.dev/src/net/http/server.go?m=text
 }
 ```
 
-Authority URL: https://go.dev/src/net/http/server.go?m=text
+Authority URL: https://raw.githubusercontent.com/golang/go/go1.26.6/src/net/http/server.go
 
 </details>
 
@@ -772,7 +780,7 @@ Authority URL: https://go.dev/src/net/http/server.go?m=text
 }
 ```
 
-Authority URL: https://go.dev/src/net/http/server.go?m=text
+Authority URL: https://raw.githubusercontent.com/golang/go/go1.26.6/src/net/http/server.go
 
 </details>
 
@@ -859,7 +867,7 @@ Authority URL: https://go.dev/src/net/http/server.go?m=text
 }
 ```
 
-Authority URL: https://go.dev/src/net/http/request.go?m=text
+Authority URL: https://raw.githubusercontent.com/golang/go/go1.26.6/src/net/http/request.go
 
 </details>
 

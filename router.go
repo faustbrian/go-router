@@ -49,7 +49,6 @@ type Router struct {
 	methodNotAllowed http.Handler
 	automaticOptions bool
 	redirectPolicy   RedirectPolicy
-	canonicalizer    *http.ServeMux
 }
 
 // Routes returns the deterministic compiled route table.
@@ -116,12 +115,16 @@ func (r *Router) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	if r.redirectPolicy == FollowRedirects && nonCanonicalPath(request.URL.EscapedPath()) {
-		r.canonicalizer.ServeHTTP(writer, request)
+		servePinnedCanonicalRedirect(writer, request)
 		return
 	}
 
 	hosts := r.matchingHosts(authorityHost(request.Host))
 	if host := r.matchingHostForMethod(hosts, request); host != nil {
+		if host.requiresSubtreeRedirect(request) {
+			servePinnedSubtreeRedirect(writer, request)
+			return
+		}
 		host.mux.ServeHTTP(writer, request)
 		return
 	}
@@ -261,9 +264,15 @@ func (h *compiledHost) requiresRedirect(request *http.Request) bool {
 	if nonCanonicalPath(request.URL.EscapedPath()) {
 		return true
 	}
+	return h.requiresSubtreeRedirect(request)
+}
+
+func (h *compiledHost) requiresSubtreeRedirect(request *http.Request) bool {
 	for _, redirects := range h.redirects {
 		if _, pattern := redirects.Handler(request); pattern != "" {
-			return true
+			_, matchedPattern := h.mux.Handler(request)
+			_, matchedPath, ok := strings.Cut(matchedPattern, " ")
+			return ok && redirectRoot(matchedPath) != ""
 		}
 	}
 	return false
@@ -281,18 +290,38 @@ func redirectRoot(pattern string) string {
 	return ""
 }
 
+func servePinnedCanonicalRedirect(writer http.ResponseWriter, request *http.Request) {
+	redirect := &url.URL{
+		Path:     canonicalPath(request.URL.EscapedPath()),
+		RawQuery: request.URL.RawQuery,
+	}
+	http.RedirectHandler(redirect.String(), http.StatusTemporaryRedirect).ServeHTTP(writer, request)
+}
+
+func servePinnedSubtreeRedirect(writer http.ResponseWriter, request *http.Request) {
+	redirect := &url.URL{
+		Path:     canonicalPath(request.URL.Path) + "/",
+		RawQuery: request.URL.RawQuery,
+	}
+	http.RedirectHandler(redirect.String(), http.StatusTemporaryRedirect).ServeHTTP(writer, request)
+}
+
 func nonCanonicalPath(value string) bool {
+	return canonicalPath(value) != value
+}
+
+func canonicalPath(value string) string {
 	if value == "" {
-		return true
+		return "/"
 	}
 	if value[0] != '/' {
-		return true
+		value = "/" + value
 	}
 	cleaned := pathpkg.Clean(value)
 	if strings.HasSuffix(value, "/") && cleaned != "/" {
 		cleaned += "/"
 	}
-	return cleaned != value
+	return cleaned
 }
 
 func (r *Router) allMethods() []string {

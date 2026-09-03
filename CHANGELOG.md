@@ -21,6 +21,8 @@ Versioning.
   router's public API and package-owned verification evidence.
 - Pin reusable CI to the immutable v1.3.0 workflow so hosted checks enforce
   the same cohesion contract as local validation.
+- Preserve the pinned Go 1.26.6 escaped-path redirect serialization across
+  later Go toolchains instead of silently adopting Go 1.27 wire changes.
 
 ### Documentation
 
@@ -30,11 +32,14 @@ Versioning.
   decision history.
 
   - ROUTER-DEC-001 sha256:56f4ea57efd1fb24b8650c883bea47f05872c63d6fb4f4fb43f1f2bdafe9ff8c
+  - ROUTER-DEC-001 sha256:f446182ad093b6e3dc1f40e180fe8ad03f88733233cf8a3f2722740c3b804585
   - ROUTER-DEC-002 sha256:f8dbfe4fe493cc3b71c400f985206aef6654f266f705ff0a6f8fdbb9fd979811
   - ROUTER-DEC-003 sha256:e57444cf3c6e408a366c339ed4f622897c655ccf85dfa6545628d07e04cd5964
   - ROUTER-DEC-003 sha256:131ba5fada36d81eb47b1d595b624ee2cf0b95e6cfdfde47409b8492e156d2f3
   - ROUTER-DEC-004 sha256:d06af40fb0a74ae46f2f22d843c09effd2c397777bf07d2a9f931fdec3e9efb2
   - ROUTER-DEC-005 sha256:383d99f58bc5bf65b234941feb386c096b673e5276e45cba86aa31e5d80971e9
+  - ROUTER-DEC-005 sha256:35abe45420556f55ed3d65b43fb6f2d172710ada3949468b4a0526aac74db0d4
+  - ROUTER-DEC-005 sha256:adf00e74ff1fee7ab18248fef929a805e30d4dfd14ddaa69d67859d70af701f0
   - ROUTER-DEC-006 sha256:9fa23204c8ff2ae12d5631c7947091b32436be3bf075a29f2700037a7bce27c1
   - ROUTER-DEC-007 sha256:1eb13de30f37d6bc1e8e7924ace29a967364d88f22570ca7cc84f2c5659e9139
   - ROUTER-DEC-008 sha256:bcf6f5c4c6b7b3960e028c33645cedbb22dcfab2d7460d2acee73077edee2c2b
@@ -49,6 +54,10 @@ Versioning.
   standalone, human-oriented documentation structure.
 - Link the router to the immutable v1.3.0 Golib ecosystem index and
   service-edge package-selection guidance.
+- Bind monitored Go source files to immutable Go 1.26.6 URLs and record the
+  reviewed Go 1.27 redirect change without changing the support baseline.
+- Record RFC 9110 Erratum 9162 as behavior-neutral because generated `Allow`
+  field values already use comma-space separation.
 
 ## [1.0.0] - 2026-08-25
 

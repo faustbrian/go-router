@@ -254,6 +254,78 @@ func TestCanonicalRedirectsPrecedeRouteAndMethodSelection(t *testing.T) {
 	}
 }
 
+func TestPinnedServeMuxRedirectsPreserveGo126EscapedPathBehavior(t *testing.T) {
+	t.Parallel()
+
+	canonical := mustCompile(t, router.New())
+	subtreeBuilder := router.New()
+	mustRegister(t, subtreeBuilder, router.Route{
+		Methods: []string{http.MethodGet}, Path: "/encoded%2f/", Handler: http.NotFoundHandler(),
+	})
+	subtree := mustCompile(t, subtreeBuilder)
+
+	for _, testCase := range []struct {
+		name     string
+		router   http.Handler
+		target   string
+		location string
+	}{
+		{
+			name:     "canonical path",
+			router:   canonical,
+			target:   "/files/a%2Fb//tail?source=test",
+			location: "/files/a%252Fb/tail?source=test",
+		},
+		{
+			name:     "subtree root",
+			router:   subtree,
+			target:   "/encoded%2F",
+			location: "/encoded/",
+		},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			response := httptest.NewRecorder()
+			testCase.router.ServeHTTP(response, httptest.NewRequest(http.MethodGet, testCase.target, nil))
+			if response.Code != http.StatusTemporaryRedirect || response.Header().Get("Location") != testCase.location {
+				t.Fatalf("%s: status=%d location=%q", testCase.target, response.Code, response.Header().Get("Location"))
+			}
+		})
+	}
+}
+
+func TestPinnedSubtreeRedirectDoesNotOverrideExplicitRoot(t *testing.T) {
+	t.Parallel()
+
+	for _, testCase := range []struct {
+		name          string
+		rootPattern   string
+		treePattern   string
+		requestTarget string
+	}{
+		{name: "literal", rootPattern: "/tree", treePattern: "/tree/", requestTarget: "/tree"},
+		{name: "wildcard", rootPattern: "/{value}", treePattern: "/{value}/", requestTarget: "/tree"},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			builder := router.New()
+			mustRegister(t, builder, router.Route{
+				Methods: []string{http.MethodGet}, Path: testCase.rootPattern,
+				Handler: http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
+					writer.Header().Set("X-Route", "root")
+					writer.WriteHeader(http.StatusNoContent)
+				}),
+			})
+			mustRegister(t, builder, router.Route{
+				Methods: []string{http.MethodGet}, Path: testCase.treePattern, Handler: http.NotFoundHandler(),
+			})
+			response := httptest.NewRecorder()
+			mustCompile(t, builder).ServeHTTP(response, httptest.NewRequest(http.MethodGet, testCase.requestTarget, nil))
+			if response.Code != http.StatusNoContent || response.Header().Get("X-Route") != "root" || response.Header().Get("Location") != "" {
+				t.Fatalf("status=%d route=%q location=%q", response.Code, response.Header().Get("X-Route"), response.Header().Get("Location"))
+			}
+		})
+	}
+}
+
 func TestDocumentedServeMuxDispatchDivergences(t *testing.T) {
 	t.Parallel()
 
