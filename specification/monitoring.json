@@ -1,30 +1,30 @@
 {
   "schema_version": 1,
-  "reviewed_at": "2026-08-30",
+  "reviewed_at": "2026-09-03",
   "review_interval_days": 90,
   "authorities": [
     {
       "id": "go-net-http",
       "kind": "specification",
       "version": "Go 1.26.6",
-      "url": "https://go.dev/src/net/http/server.go?m=text",
-      "sha256": "8a46dd48f65aba824366170f8f335417af263fc60b7b4e04ef2a4bba4a21253d",
+      "url": "https://raw.githubusercontent.com/golang/go/go1.26.6/src/net/http/server.go",
+      "sha256": "ac720f2b48b30f6e1a58d125a08488c7849fd9723b5060d47d2304cde4de6a76",
       "specifications": ["Go 1.26.6 net/http and net/url contracts"]
     },
     {
       "id": "go-net-http-request",
       "kind": "specification",
       "version": "Go 1.26.6",
-      "url": "https://go.dev/src/net/http/request.go?m=text",
-      "sha256": "c3257079994b4e4f74f01cef72508919983ba31f91fcf599d348e9d52cec1540",
+      "url": "https://raw.githubusercontent.com/golang/go/go1.26.6/src/net/http/request.go",
+      "sha256": "4a34a9e157a606a046d5b9f8f761c571c4762668fa351d92048515a595939c38",
       "specifications": ["Go 1.26.6 net/http and net/url contracts"]
     },
     {
       "id": "go-net-url",
       "kind": "specification",
       "version": "Go 1.26.6",
-      "url": "https://go.dev/src/net/url/url.go?m=text",
-      "sha256": "44c33f88526abf3b5955d6c97297be5c9d228e741b33e52c940dcac5a496e091",
+      "url": "https://raw.githubusercontent.com/golang/go/go1.26.6/src/net/url/url.go",
+      "sha256": "7bec001746c2cd512275c7269bc293f3d36cb004ddb193d736e02e361a3778aa",
       "specifications": ["Go 1.26.6 net/http and net/url contracts"]
     },
     {
@@ -32,7 +32,7 @@
       "kind": "releases",
       "version": "",
       "url": "https://go.dev/dl/?mode=json&include=all",
-      "sha256": "c0696d6e5708cce9644204513ee4ecb994f3fd748065c54b0890158c34631207",
+      "sha256": "638127a053a86576fc235aa196b26145c6f2fce8ce839ded767212a18d1c9415",
       "specifications": ["Go 1.26.6 net/http and net/url contracts"]
     },
     {
@@ -64,7 +64,7 @@
       "kind": "errata",
       "version": "",
       "url": "https://errata.rfc-editor.org/search/?rfc_number=9110&presentation=records",
-      "sha256": "38bd006c96f8963d58573f704c5313a5f81968b90738c03ade0b036ec7bbdf4b",
+      "sha256": "1f6790054c0cdb2f2a70a94fa2b9c73b09a4ee0578a32b4a3006ed0ecfaac86d",
       "specifications": ["RFC 9110 HTTP Semantics"]
     },
     {
