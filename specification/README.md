@@ -13,6 +13,8 @@ The canonical
 [`docs/specification-decisions.md`](../docs/specification-decisions.md)
 records every material interpretation, consequence, and condition for
 reconsideration behind this conformance matrix.
+Reviewed monitoring changes and their decision applicability are preserved in
+the append-only [`upstream-reviews.md`](upstream-reviews.md) history.
 
 ## Decision conformance matrix
 
