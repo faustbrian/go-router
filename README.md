@@ -19,8 +19,8 @@ The minimum supported toolchain is Go 1.26.6. The package has no runtime
 dependencies and no global router, reflection discovery, controller resolver,
 container, session, template, or application lifecycle.
 
-See the versioned [Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.3.0/docs/ecosystem/README.md)
-and its [service-edge package guidance](https://github.com/faustbrian/go-library-tools/blob/v1.3.0/docs/ecosystem/design-language.md#package-families-and-selection)
+See the versioned [Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/README.md)
+and its [service-edge package guidance](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/design-language.md#package-families-and-selection)
 for the shared design language and related packages.
 
 ## Five-minute start
@@ -77,6 +77,8 @@ reproducible.
 
 Run `make cohesion` to validate this module's catalog classification,
 ownership contract, documentation entry points, and ecosystem navigation.
+Run `make ci` for the complete local contract, including online specification
+source validation.
 
 ## License
 

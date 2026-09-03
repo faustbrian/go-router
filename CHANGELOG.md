@@ -9,6 +9,10 @@ Versioning.
 
 ### Changed
 
+- Adopt the checksum-verified `go-library-tools` v1.4.0 CLI and immutable
+  shared workflow while preserving every existing repository gate.
+- Include authoritative online specification validation in the complete local
+  CI contract enforced by `make ci`.
 - Replace copied repository tooling with the checksum-pinned
   `go-library-tools` v1.2.0 specification-governance contract while retaining
   package-owned policy and verification evidence.
@@ -26,6 +30,8 @@ Versioning.
 
 ### Documentation
 
+- Preserve the reviewed Go release and RFC 9110 errata dispositions in an
+  append-only upstream authority history.
 - Make the [specification decision register](docs/specification-decisions.md)
   machine-auditable with monitored source and errata authorities, attributable
   conformance evidence, classified interoperability results, and durable
