@@ -20,6 +20,8 @@
 
 - [Performance](performance.md)
 - [Security](security.md)
+- [Support](../SUPPORT.md)
+- [Vulnerability reporting](../SECURITY.md)
 
 ## Reference and maintenance
 

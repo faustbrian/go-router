@@ -15,13 +15,20 @@ programming model. It adds deterministic composition, groups, names, safe URL
 generation, metadata, introspection, mounts, and route-scoped middleware while
 keeping handlers as ordinary `http.Handler` values.
 
-The minimum supported toolchain is Go 1.26.6. The package has no runtime
-dependencies and no global router, reflection discovery, controller resolver,
-container, session, template, or application lifecycle.
+The module is active and has a stable v1 API. The minimum supported toolchain
+is Go 1.26.6. The package has no runtime dependencies and no global router,
+reflection discovery, controller resolver, container, session, template, or
+application lifecycle.
 
 See the versioned [Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/README.md)
 and its [service-edge package guidance](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/design-language.md#package-families-and-selection)
 for the shared design language and related packages.
+
+## Installation
+
+```sh
+go get github.com/faustbrian/go-router@v1
+```
 
 ## Five-minute start
 
@@ -58,6 +65,8 @@ immutable `http.Handler` safe for concurrent serving and introspection.
 - [Behavior matrices](docs/matrices.md)
 - [Resource limits](docs/limits.md)
 - [Security](docs/security.md)
+- [Support](SUPPORT.md)
+- [Vulnerability reporting](SECURITY.md)
 - [Architecture](docs/architecture.md)
 - [Five-minute quickstarts](docs/quickstart.md)
 - [API reference](docs/api.md)

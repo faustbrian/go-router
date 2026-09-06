@@ -30,6 +30,11 @@ Versioning.
 
 ### Documentation
 
+- Clarify the stable v1 support baseline and canonical installation command,
+  expose support and vulnerability-reporting entry points, and correct the
+  security advisory repository identity.
+- Record the latest Go releases-feed digest as behavior-neutral after
+  re-verifying every pinned Go 1.26.6 source and contract binding.
 - Preserve the reviewed Go release and RFC 9110 errata dispositions in an
   append-only upstream authority history.
 - Make the [specification decision register](docs/specification-decisions.md)
