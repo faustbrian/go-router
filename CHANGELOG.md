@@ -30,8 +30,9 @@ Versioning.
 
 ### Documentation
 
-- Clarify the stable v1 support baseline, canonical installation command, and
-  support and vulnerability-reporting entry points.
+- Clarify the stable v1 support baseline and canonical installation command,
+  expose support and vulnerability-reporting entry points, and correct the
+  security advisory repository identity.
 - Record the latest Go releases-feed digest as behavior-neutral after
   re-verifying every pinned Go 1.26.6 source and contract binding.
 - Preserve the reviewed Go release and RFC 9110 errata dispositions in an
