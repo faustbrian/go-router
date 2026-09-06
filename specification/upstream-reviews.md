@@ -5,6 +5,32 @@ by [`monitoring.json`](monitoring.json). A monitoring digest changes only after
 the corresponding upstream delta has been classified against the applicable
 specification decisions.
 
+## 2026-09-06: Go releases feed
+
+- **Authority:** `go-releases`
+- **URL:** https://go.dev/dl/?mode=json&include=all
+- **Previous SHA-256:**
+  `638127a053a86576fc235aa196b26145c6f2fce8ce839ded767212a18d1c9415`
+- **Reviewed SHA-256:**
+  `1ed915f72633d0a72eaa2f462740153db4fe347cb56f7d1e25ec44868568f13e`
+- **Retrieved and reviewed:** 2026-09-06
+- **Applicability:** `ROUTER-DEC-001` and `ROUTER-DEC-005`
+- **Disposition:** Behavior-neutral for the selected Go 1.26.6 contracts.
+
+The current feed retains Go 1.27.1 and Go 1.26.8 as its newest stable patch
+releases, matching the versions classified in the previous review. The prior
+response body was not retained, so this review cannot attribute the byte-level
+feed change to a specific archived download entry. Three consecutive current
+responses were byte-identical.
+
+The Go 1.26.6 feed entry still identifies `go1.26.6.src.tar.gz` with SHA-256
+`a0721c54c688901448d77ad9b3ec7ea7c474730755ff891382e92ecb93ff2cb1`,
+which matches the pinned source archive in `manifest.tsv`. The monitored
+`server.go`, `request.go`, and `url.go` bytes were independently re-fetched
+from the immutable `go1.26.6` tag and continue to match their recorded hashes.
+The selected source, minimum supported Go version, decisions, and executable
+evidence therefore remain unchanged.
+
 ## 2026-09-03: Go releases feed
 
 - **Authority:** `go-releases`

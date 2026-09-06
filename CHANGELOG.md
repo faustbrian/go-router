@@ -30,6 +30,8 @@ Versioning.
 
 ### Documentation
 
+- Record the latest Go releases-feed digest as behavior-neutral after
+  re-verifying every pinned Go 1.26.6 source and contract binding.
 - Preserve the reviewed Go release and RFC 9110 errata dispositions in an
   append-only upstream authority history.
 - Make the [specification decision register](docs/specification-decisions.md)

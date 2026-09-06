@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reviewed_at": "2026-09-03",
+  "reviewed_at": "2026-09-06",
   "review_interval_days": 90,
   "authorities": [
     {
@@ -32,7 +32,7 @@
       "kind": "releases",
       "version": "",
       "url": "https://go.dev/dl/?mode=json&include=all",
-      "sha256": "638127a053a86576fc235aa196b26145c6f2fce8ce839ded767212a18d1c9415",
+      "sha256": "1ed915f72633d0a72eaa2f462740153db4fe347cb56f7d1e25ec44868568f13e",
       "specifications": ["Go 1.26.6 net/http and net/url contracts"]
     },
     {
