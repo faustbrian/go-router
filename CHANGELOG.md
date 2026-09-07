@@ -30,6 +30,9 @@ Versioning.
 
 ### Documentation
 
+- Align the root-module tag syntax, stable-v1 support boundary, and private
+  security-reporting route with the published repository, and correct the
+  initial release date to its verified tag and release chronology.
 - Clarify the stable v1 support baseline and canonical installation command,
   expose support and vulnerability-reporting entry points, and correct the
   security advisory repository identity.
@@ -70,7 +73,7 @@ Versioning.
 - Record RFC 9110 Erratum 9162 as behavior-neutral because generated `Allow`
   field values already use comma-space separation.
 
-## [1.0.0] - 2026-08-25
+## [1.0.0] - 2026-08-26
 
 ### Fixed
 
