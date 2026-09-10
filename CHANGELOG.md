@@ -9,6 +9,7 @@ Versioning.
 
 ### Changed
 
+- Require Go 1.27.0 for development, builds, and downstream consumers.
 - Adopt the checksum-verified `go-library-tools` v1.4.0 CLI and immutable
   shared workflow while preserving every existing repository gate.
 - Include authoritative online specification validation in the complete local
