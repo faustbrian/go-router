@@ -20,7 +20,7 @@ mkdir "$temporary/integration"
 cat >"$temporary/integration/go.mod" <<EOF
 module routerintegration
 
-go 1.26.6
+go 1.27.0
 
 require (
   github.com/faustbrian/go-http-middleware v1.0.0
