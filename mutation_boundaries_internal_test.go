@@ -248,7 +248,10 @@ func TestCompilerHelperBoundaries(t *testing.T) {
 		t.Fatal("route sort key changed")
 	}
 
-	builder := New(WithMiddleware(named("one"), named("two")))
+	builder := New(WithMiddleware(
+		NamedMiddleware{Name: "one", Middleware: passthrough, ExclusionPolicy: MiddlewareExclusionAllowed},
+		named("two"),
+	))
 	resolved, names, resolveErr := builder.resolveMiddleware(Route{
 		Source: "src", ExcludeMiddleware: []string{"one"}, Middleware: []NamedMiddleware{{Middleware: passthrough}},
 	})
@@ -632,10 +635,14 @@ func TestGroupAndMetadataExactBoundaries(t *testing.T) {
 		joinPrefix("/api/", "") != "/api" || joinPrefix("/api/", "/x") != "/api/x" {
 		t.Fatal("prefix joining changed")
 	}
-	middleware := []NamedMiddleware{named("one"), {Middleware: passthrough}, named("two")}
-	filtered := excludeInheritedMiddleware(middleware, []string{"one"})
-	if len(filtered) != 2 || filtered[0].Name != "" || filtered[1].Name != "two" {
-		t.Fatalf("filtered middleware = %#v", filtered)
+	middleware := []NamedMiddleware{
+		{Name: "one", Middleware: passthrough, ExclusionPolicy: MiddlewareExclusionAllowed},
+		{Middleware: passthrough},
+		named("two"),
+	}
+	filtered, denied := excludeInheritedMiddleware(middleware, []string{"one"})
+	if denied != "" || len(filtered) != 2 || filtered[0].Name != "" || filtered[1].Name != "two" {
+		t.Fatalf("filtered middleware = %#v, denied = %q", filtered, denied)
 	}
 
 	accountingLimits := DefaultLimits()

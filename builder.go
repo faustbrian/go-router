@@ -63,6 +63,10 @@ func New(options ...Option) *Builder {
 			return len(middleware.Name) > builder.limits.MaxNameBytes
 		}):
 			builder.optionErr = &Error{Kind: ErrLimitExceeded, Field: "middleware", Detail: "router middleware name is too long"}
+		case slices.ContainsFunc(builder.globalMiddleware, func(middleware NamedMiddleware) bool {
+			return !validMiddlewareExclusionPolicy(middleware.ExclusionPolicy)
+		}):
+			builder.optionErr = &Error{Kind: ErrInvalidRoute, Field: "middleware", Detail: "invalid middleware exclusion policy"}
 		default:
 			builder.globalMiddleware = append([]NamedMiddleware(nil), builder.globalMiddleware...)
 		}
@@ -235,6 +239,9 @@ func (b *Builder) validateRoute(route Route) error {
 		if middleware.Middleware == nil {
 			return b.routeError(ErrInvalidRoute, "middleware", route.Source, "nil middleware")
 		}
+		if !validMiddlewareExclusionPolicy(middleware.ExclusionPolicy) {
+			return b.routeError(ErrInvalidRoute, "middleware", route.Source, "invalid middleware exclusion policy")
+		}
 		if middleware.Name != "" {
 			if !validName(middleware.Name) {
 				return b.routeError(ErrInvalidRoute, "middleware", route.Source, "invalid middleware name")
@@ -246,6 +253,10 @@ func (b *Builder) validateRoute(route Route) error {
 		}
 	}
 	return validateServeMuxPattern(route.Methods[0], route.Path, b.routeError, route.Source)
+}
+
+func validMiddlewareExclusionPolicy(policy MiddlewareExclusionPolicy) bool {
+	return policy == MiddlewareExclusionDenied || policy == MiddlewareExclusionAllowed
 }
 
 func (b *Builder) validateHost(host, source string) error {

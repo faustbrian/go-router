@@ -9,6 +9,15 @@ Versioning.
 
 ### Changed
 
+- **Breaking:** Move the source module to the `/v2` import path for the
+  fail-closed middleware-exclusion and mount-default changes. No v2 artifact is
+  published yet; existing consumers must remain on v1 until release.
+- Make inherited router and group middleware non-excludable by default; layer
+  owners must explicitly opt non-security middleware into route exclusion.
+  `NamedMiddleware` now includes `ExclusionPolicy`; consumers using positional
+  struct literals must migrate to keyed literals.
+- Remove TRACE from the default mount method set while retaining explicit
+  TRACE registration through `MountOptions.Methods`.
 - Require Go 1.27.0 for development, builds, and downstream consumers.
 - Adopt the checksum-verified `go-library-tools` v1.4.0 CLI and immutable
   shared workflow while preserving every existing repository gate.
@@ -58,6 +67,7 @@ Versioning.
   - ROUTER-DEC-006 sha256:9fa23204c8ff2ae12d5631c7947091b32436be3bf075a29f2700037a7bce27c1
   - ROUTER-DEC-007 sha256:1eb13de30f37d6bc1e8e7924ace29a967364d88f22570ca7cc84f2c5659e9139
   - ROUTER-DEC-008 sha256:bcf6f5c4c6b7b3960e028c33645cedbb22dcfab2d7460d2acee73077edee2c2b
+  - ROUTER-DEC-008 sha256:562e1b14770044303418df87a407216407497982376600827fd3f3cd8e4c7492
   - ROUTER-DEC-009 sha256:d9b4e24c30bcd894c78acf8b92d8bea117053a186f64b34cdb98bd6f24a5cc50
   - ROUTER-DEC-010 sha256:b5d8f22178d8134c9f8d51926982579efddbd5f06abe7e73ed3bbb323718d4a7
   - ROUTER-DEC-011 sha256:344c1ed6825f17af34fc9ed9be101d2bf730a2ce7efd316091f28cc505b14bc1

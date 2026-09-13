@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"testing"
 
-	router "github.com/faustbrian/go-router"
+	router "github.com/faustbrian/go-router/v2"
 )
 
 func TestNamedPathGenerationEscapesSegmentsAndRoundTrips(t *testing.T) {

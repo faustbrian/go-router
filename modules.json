@@ -5,14 +5,14 @@
   "modules": [
     {
       "directory": ".",
-      "module_path": "github.com/faustbrian/go-router",
+      "module_path": "github.com/faustbrian/go-router/v2",
       "go_version": "1.27.0",
       "packages": [
         {
           "module_directory": ".",
           "directory": ".",
           "name": "router",
-          "import_path": "github.com/faustbrian/go-router",
+          "import_path": "github.com/faustbrian/go-router/v2",
           "kind": "public",
           "production": true,
           "executable": true,
@@ -24,7 +24,7 @@
           "module_directory": ".",
           "directory": "routertest",
           "name": "routertest",
-          "import_path": "github.com/faustbrian/go-router/routertest",
+          "import_path": "github.com/faustbrian/go-router/v2/routertest",
           "kind": "test support",
           "production": false,
           "executable": true,
@@ -34,14 +34,14 @@
         }
       ],
       "purpose": "`router` is an explicit, immutable HTTP router built on Go's `net/http` programming model. It adds deterministic composition, groups, names, safe URL generation, metadata, introspection, mounts, and route-scoped middleware while keeping handlers as ordinary `http.Handler` values.",
-      "lifecycle": "stable",
+      "lifecycle": "planned",
       "kind": "public library",
-      "releasable": true,
+      "releasable": false,
       "family": "service-edge",
       "family_label": "Service Edge",
       "family_description": "Request-edge policy, identity, access decisions, routing, middleware, and process lifecycle.",
       "family_order": 2,
-      "version": "1.0.0",
+      "version": "2.0.0",
       "tag_prefix": "v",
       "owned_dependencies": [],
       "reverse_owned_dependencies": [
@@ -84,14 +84,14 @@
         ],
         "public_package_identifier": "router",
         "primary_entry_packages": [
-          "github.com/faustbrian/go-router"
+          "github.com/faustbrian/go-router/v2"
         ],
         "package_selection": {
-          "github.com/faustbrian/go-router": "Use for explicit immutable HTTP route composition, dispatch, introspection, mounts, and named URL generation while retaining ordinary net/http handler ownership.",
-          "github.com/faustbrian/go-router/routertest": "Use in tests for deterministic router compilation, serving, status assertions, and route-table inspection."
+          "github.com/faustbrian/go-router/v2": "Use for explicit immutable HTTP route composition, dispatch, introspection, mounts, and named URL generation while retaining ordinary net/http handler ownership.",
+          "github.com/faustbrian/go-router/v2/routertest": "Use in tests for deterministic router compilation, serving, status assertions, and route-table inspection."
         },
-        "lifecycle_status": "active",
-        "maturity": "stable",
+        "lifecycle_status": "planned",
+        "maturity": "preview",
         "construction_styles": [
           "builder-compile",
           "functional-options",
@@ -113,7 +113,7 @@
         "adapters": [],
         "companions": [
           "github.com/faustbrian/go-http-middleware",
-          "github.com/faustbrian/go-router/routertest",
+          "github.com/faustbrian/go-router/v2/routertest",
           "github.com/faustbrian/go-service"
         ],
         "supported_go": {

@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"testing"
 
-	router "github.com/faustbrian/go-router"
+	router "github.com/faustbrian/go-router/v2"
 )
 
 func TestMountStripsPathOnCloneAndPreservesRequestTarget(t *testing.T) {
@@ -206,6 +206,38 @@ func TestMountValidationAndConflictReturnErrors(t *testing.T) {
 	}
 	if _, err := builder.Compile(); !errors.Is(err, router.ErrConflict) {
 		t.Fatalf("mount conflict: got %v", err)
+	}
+}
+
+func TestMountDefaultMethodsDoNotExposeTRACE(t *testing.T) {
+	t.Parallel()
+
+	called := false
+	builder := router.New()
+	if err := builder.Mount("/assets", http.HandlerFunc(func(http.ResponseWriter, *http.Request) {
+		called = true
+	}), router.MountOptions{}); err != nil {
+		t.Fatalf("mount: %v", err)
+	}
+	response := httptest.NewRecorder()
+	mustCompile(t, builder).ServeHTTP(response, httptest.NewRequest(http.MethodTrace, "/assets/file", nil))
+
+	if called || response.Code != http.StatusMethodNotAllowed {
+		t.Fatalf("default TRACE dispatch: called=%t status=%d", called, response.Code)
+	}
+
+	explicitCalled := false
+	explicit := router.New()
+	if err := explicit.Mount("/assets", http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
+		explicitCalled = true
+		writer.WriteHeader(http.StatusNoContent)
+	}), router.MountOptions{Methods: []string{http.MethodTrace}}); err != nil {
+		t.Fatalf("explicit TRACE mount: %v", err)
+	}
+	explicitResponse := httptest.NewRecorder()
+	mustCompile(t, explicit).ServeHTTP(explicitResponse, httptest.NewRequest(http.MethodTrace, "/assets/file", nil))
+	if !explicitCalled || explicitResponse.Code != http.StatusNoContent {
+		t.Fatalf("explicit TRACE dispatch: called=%t status=%d", explicitCalled, explicitResponse.Code)
 	}
 }
 

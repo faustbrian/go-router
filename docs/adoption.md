@@ -1,5 +1,12 @@
 # Adoption Guides
 
+This source tree prepares an unpublished v2 release. Existing applications,
+including the owned `go-http-middleware/integration/siblings` and
+`go-service/integration/reference-http` consumers, must remain on released v1
+without local replacements until v2 is published. Their v2 migration and
+compatibility verification are release blockers, not evidence available from
+the unpublished source tree.
+
 ## REST-like APIs
 
 Use explicit method sets and `{id}` path wildcards. Group stable API versions,

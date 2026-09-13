@@ -1,5 +1,10 @@
 # Standard-library Compatibility
 
+The immutable v1 API baseline remains in `api/baseline.txt`. Active source and
+compatibility checks use the distinct `api/v2.txt` baseline for the pending,
+unpublished `github.com/faustbrian/go-router/v2` module. Public installation
+guidance remains on released v1 until the first v2 tag exists.
+
 The minimum supported Go release and development toolchain are 1.27.0, the
 latest stable release when this contract was written.
 
@@ -38,7 +43,8 @@ registration is used.
 | Redirect policy | Canonical and subtree redirects | Same by default; may explicitly turn them into 404 | Keep `FollowRedirects` for standard behavior |
 | Introspection | No immutable public route table | Stable copied descriptors without handlers | Metadata can drive docs and policy adapters |
 | URL generation | Not provided | Named, bounded, component-escaped generation | Supply every wildcard explicitly |
-| Middleware | Caller wraps handlers manually | Visible router/group/route composition | Ordering is frozen at compile time |
+| Middleware | Caller wraps handlers manually | Visible router/group/route composition; inherited layers are non-excludable by default | Ordering and exclusion policy are frozen at compile time; explicitly opt non-security layers into exclusion |
+| Mounted methods | Caller registers each pattern | Omitted method list registers DELETE, GET, HEAD, OPTIONS, PATCH, POST, and PUT, but not TRACE | Include TRACE explicitly only when the mounted handler supports it |
 | CONNECT | Authority-form may be matched by a method pattern | Registration is rejected in v1 | Mount CONNECT handling outside this router |
 
 The 404 and 405 compatibility assertions use automatic OPTIONS disabled,
@@ -46,6 +52,11 @@ because enabling it deliberately changes both OPTIONS dispatch and the methods
 advertised by 405. Executable divergence fixtures freeze the four affected
 cases: 405 `Allow`, origin-form OPTIONS, `OPTIONS *`, and unsupported-method
 misses.
+
+`NamedMiddleware` gained the `ExclusionPolicy` field as part of the secure
+exclusion contract. This is a source compatibility break for positional struct
+literals; use keyed literals so omitted policy retains the fail-closed zero
+value.
 
 The complete status, precedence, redirect, middleware, mount, and generation
 tables are frozen in [Behavior Matrices](matrices.md).

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	router "github.com/faustbrian/go-router"
+	router "github.com/faustbrian/go-router/v2"
 )
 
 func TestCompiledRouterDispatchesWithPathValuesAndMatchedRoute(t *testing.T) {

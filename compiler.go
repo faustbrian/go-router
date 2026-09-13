@@ -146,6 +146,9 @@ func (b *Builder) validateGlobalMiddleware() error {
 		if middleware.Middleware == nil {
 			return b.routeError(ErrInvalidRoute, "middleware", "", "nil router middleware")
 		}
+		if !validMiddlewareExclusionPolicy(middleware.ExclusionPolicy) {
+			return b.routeError(ErrInvalidRoute, "middleware", "", "invalid middleware exclusion policy")
+		}
 		if middleware.Name != "" {
 			if !validName(middleware.Name) {
 				return b.routeError(ErrInvalidRoute, "middleware", "", "invalid router middleware name")
@@ -175,9 +178,13 @@ func (b *Builder) resolveMiddleware(route Route) ([]NamedMiddleware, []string, e
 	}
 	resolved := make([]NamedMiddleware, 0, len(b.globalMiddleware)+len(route.Middleware))
 	for _, middleware := range b.globalMiddleware {
-		if _, skip := excluded[middleware.Name]; !skip {
-			resolved = append(resolved, middleware)
+		if _, skip := excluded[middleware.Name]; skip {
+			if middleware.ExclusionPolicy != MiddlewareExclusionAllowed {
+				return nil, nil, b.routeError(ErrInvalidRoute, "middleware", route.Source, "cannot exclude required middleware")
+			}
+			continue
 		}
+		resolved = append(resolved, middleware)
 	}
 	resolved = append(resolved, route.Middleware...)
 	if len(resolved) > b.limits.MaxMiddleware {

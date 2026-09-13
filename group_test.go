@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	router "github.com/faustbrian/go-router"
+	router "github.com/faustbrian/go-router/v2"
 )
 
 func TestNestedGroupsFlattenComposition(t *testing.T) {
@@ -80,7 +80,8 @@ func TestRouteMayExcludeNamedGroupMiddleware(t *testing.T) {
 	called := false
 	builder := router.New()
 	err := builder.Group(router.GroupOptions{Middleware: []router.NamedMiddleware{{
-		Name: "group",
+		Name:            "group",
+		ExclusionPolicy: router.MiddlewareExclusionAllowed,
 		Middleware: func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 				called = true
@@ -110,6 +111,126 @@ func TestRouteMayExcludeNamedGroupMiddleware(t *testing.T) {
 	}
 }
 
+func TestRouteCannotExcludeGroupMiddlewareByDefault(t *testing.T) {
+	t.Parallel()
+
+	builder := router.New()
+	err := builder.Group(router.GroupOptions{Middleware: []router.NamedMiddleware{{
+		Name:       "authorize",
+		Middleware: func(next http.Handler) http.Handler { return next },
+	}}}, func(group *router.Builder) error {
+		return group.Register(router.Route{
+			Methods:           []string{http.MethodGet},
+			Path:              "/private",
+			Handler:           http.NotFoundHandler(),
+			ExcludeMiddleware: []string{"authorize"},
+		})
+	})
+
+	if !errors.Is(err, router.ErrInvalidRoute) {
+		t.Fatalf("group exclusion of required middleware: got %v", err)
+	}
+	if len(builder.PendingRoutes()) != 0 {
+		t.Fatal("failed security exclusion published a route")
+	}
+}
+
+func TestRouteExclusionFailsClosedForCollidingInheritedNames(t *testing.T) {
+	t.Parallel()
+
+	passthrough := func(next http.Handler) http.Handler { return next }
+
+	t.Run("required router layer wins over excludable nested groups", func(t *testing.T) {
+		builder := router.New(router.WithMiddleware(router.NamedMiddleware{
+			Name: "access", Middleware: passthrough,
+		}))
+		err := builder.Group(router.GroupOptions{Middleware: []router.NamedMiddleware{{
+			Name: "access", Middleware: passthrough,
+			ExclusionPolicy: router.MiddlewareExclusionAllowed,
+		}}}, func(outer *router.Builder) error {
+			return outer.Group(router.GroupOptions{Middleware: []router.NamedMiddleware{{
+				Name: "access", Middleware: passthrough,
+				ExclusionPolicy: router.MiddlewareExclusionAllowed,
+			}}}, func(inner *router.Builder) error {
+				return inner.Register(router.Route{
+					Methods: []string{http.MethodGet}, Path: "/private",
+					Handler:           http.NotFoundHandler(),
+					ExcludeMiddleware: []string{"access"},
+				})
+			})
+		})
+		if err != nil {
+			t.Fatalf("register nested route: %v", err)
+		}
+		if _, err = builder.Compile(); !errors.Is(err, router.ErrInvalidRoute) {
+			t.Fatalf("compile exclusion of colliding required router layer: %v", err)
+		}
+	})
+
+	t.Run("required nested layer wins over excludable router and outer group", func(t *testing.T) {
+		builder := router.New(router.WithMiddleware(router.NamedMiddleware{
+			Name: "access", Middleware: passthrough,
+			ExclusionPolicy: router.MiddlewareExclusionAllowed,
+		}))
+		err := builder.Group(router.GroupOptions{Middleware: []router.NamedMiddleware{{
+			Name: "access", Middleware: passthrough,
+			ExclusionPolicy: router.MiddlewareExclusionAllowed,
+		}}}, func(outer *router.Builder) error {
+			return outer.Group(router.GroupOptions{Middleware: []router.NamedMiddleware{{
+				Name: "access", Middleware: passthrough,
+			}}}, func(inner *router.Builder) error {
+				return inner.Register(router.Route{
+					Methods: []string{http.MethodGet}, Path: "/private",
+					Handler:           http.NotFoundHandler(),
+					ExcludeMiddleware: []string{"access"},
+				})
+			})
+		})
+		if !errors.Is(err, router.ErrInvalidRoute) {
+			t.Fatalf("exclude colliding required nested layer: %v", err)
+		}
+		if len(builder.PendingRoutes()) != 0 {
+			t.Fatal("failed nested exclusion published a route")
+		}
+	})
+
+	t.Run("all inherited layers may opt in while route local layer remains", func(t *testing.T) {
+		localCalled := false
+		excludable := router.NamedMiddleware{
+			Name: "access", Middleware: passthrough,
+			ExclusionPolicy: router.MiddlewareExclusionAllowed,
+		}
+		builder := router.New(router.WithMiddleware(excludable))
+		err := builder.Group(router.GroupOptions{Middleware: []router.NamedMiddleware{excludable}}, func(group *router.Builder) error {
+			return group.Register(router.Route{
+				Methods: []string{http.MethodGet}, Path: "/local",
+				ExcludeMiddleware: []string{"access"},
+				Middleware: []router.NamedMiddleware{{
+					Name: "access",
+					Middleware: func(next http.Handler) http.Handler {
+						return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+							localCalled = true
+							next.ServeHTTP(writer, request)
+						})
+					},
+				}},
+				Handler: http.NotFoundHandler(),
+			})
+		})
+		if err != nil {
+			t.Fatalf("register explicitly excludable collisions: %v", err)
+		}
+		compiled := mustCompile(t, builder)
+		compiled.ServeHTTP(httptest.NewRecorder(), httptest.NewRequest(http.MethodGet, "/local", nil))
+		if !localCalled {
+			t.Fatal("route-local middleware was removed by inherited exclusion")
+		}
+		if got := compiled.Routes()[0].Middleware; !reflect.DeepEqual(got, []string{"access"}) {
+			t.Fatalf("resolved route-local middleware: %v", got)
+		}
+	})
+}
+
 func TestGroupCompositionRejectsInvalidAndPartialState(t *testing.T) {
 	t.Parallel()
 
@@ -123,6 +244,7 @@ func TestGroupCompositionRejectsInvalidAndPartialState(t *testing.T) {
 		{name: "wildcard prefix", options: router.GroupOptions{PathPrefix: "/{api}"}, route: router.Route{Methods: []string{"GET"}, Path: "/x", Handler: handler}},
 		{name: "host conflict", options: router.GroupOptions{Host: "api.example.com"}, route: router.Route{Methods: []string{"GET"}, Host: "other.example.com", Path: "/x", Handler: handler}},
 		{name: "metadata conflict", options: router.GroupOptions{Metadata: map[string]string{"scope": "one"}}, route: router.Route{Methods: []string{"GET"}, Path: "/x", Handler: handler, Metadata: map[string]string{"scope": "two"}}},
+		{name: "invalid middleware exclusion policy", options: router.GroupOptions{Middleware: []router.NamedMiddleware{{Middleware: func(next http.Handler) http.Handler { return next }, ExclusionPolicy: 255}}}, route: router.Route{Methods: []string{"GET"}, Path: "/x", Handler: handler}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

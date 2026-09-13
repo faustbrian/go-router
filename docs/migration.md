@@ -1,5 +1,14 @@
 # Migration
 
+## Pending v2 migration
+
+The security changes below are being prepared on the
+`github.com/faustbrian/go-router/v2` module path. No v2 artifact is published
+yet, so released consumers must remain on `github.com/faustbrian/go-router`
+v1 without local replacements. After v2 is tagged, update imports and the
+module requirement together, then apply the middleware and TRACE migrations
+described below.
+
 ## From `http.ServeMux`
 
 Split each pattern into `Route.Methods`, `Route.Host`, and `Route.Path`, retain
@@ -13,7 +22,17 @@ tokens must be uppercase. Replace literal or encoded dot-segment patterns with
 semantic paths. Keep IP literals, ports, and application-selected IDNA
 normalization at the server boundary rather than in route hosts. If existing
 tables exceed `DefaultLimits`, raise only the measured budget before
-registration.
+registration. Treat `WithLimits` as trusted startup policy and never derive
+custom budgets from requests or plugin metadata.
+
+Inherited middleware is non-excludable by default. Existing routes that
+intentionally exclude a non-security router or group layer must set that
+layer's `NamedMiddleware.ExclusionPolicy` to
+`MiddlewareExclusionAllowed`; authentication and authorization layers should
+keep the zero value. Convert positional `NamedMiddleware` literals to keyed
+literals when adopting the new field. Mounts no longer include TRACE in their
+default method set, so list TRACE explicitly in `MountOptions.Methods` when
+required.
 
 ## From Laravel routes
 

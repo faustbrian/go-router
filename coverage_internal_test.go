@@ -147,6 +147,11 @@ func TestCompileMiddlewareAndRouteInformationBoundaries(t *testing.T) {
 			}
 		})
 	}
+	if err := New(WithMiddleware(NamedMiddleware{
+		Middleware: passthrough, ExclusionPolicy: 255,
+	})).Register(Route{Methods: []string{"GET"}, Path: "/", Handler: handler}); !errors.Is(err, ErrInvalidRoute) {
+		t.Fatalf("global invalid exclusion policy: %v", err)
+	}
 
 	limits := DefaultLimits()
 	limits.MaxMiddleware = 1
@@ -162,7 +167,9 @@ func TestCompileMiddlewareAndRouteInformationBoundaries(t *testing.T) {
 		t.Fatalf("global depth before registration: %v", err)
 	}
 
-	builder = New(WithMiddleware(NamedMiddleware{Middleware: passthrough}, named("excluded")))
+	builder = New(WithMiddleware(NamedMiddleware{Middleware: passthrough}, NamedMiddleware{
+		Name: "excluded", Middleware: passthrough, ExclusionPolicy: MiddlewareExclusionAllowed,
+	}))
 	if err := builder.Register(Route{Methods: []string{"GET"}, Path: "/", Handler: handler, ExcludeMiddleware: []string{"excluded"}}); err != nil {
 		t.Fatalf("register exclusion: %v", err)
 	}

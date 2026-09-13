@@ -74,12 +74,12 @@
     {
       "id": "ROUTER-DEC-008",
       "authoritative_sources": ["go-net-http"],
-      "executable_evidence": ["TestMiddlewareOrderAndIntrospectionAreStableAndImmutable", "TestRouteMayExcludeNamedGroupMiddleware", "TestMiddlewareMayShortCircuitPanicCancelAndReenter", "TestRouterPreservesResponseWriterOptionalInterfaces"],
-      "fixtures": ["middleware_hardening_test.go"],
+      "executable_evidence": ["TestMiddlewareOrderAndIntrospectionAreStableAndImmutable", "TestRouteCannotExcludeRouterMiddlewareByDefault", "TestRouteMayExcludeExplicitlyExcludableRouterMiddleware", "TestRouteCannotExcludeGroupMiddlewareByDefault", "TestRouteMayExcludeNamedGroupMiddleware", "TestMiddlewareMayShortCircuitPanicCancelAndReenter", "TestRouterPreservesResponseWriterOptionalInterfaces"],
+      "fixtures": ["middleware_hardening_test.go", "group_test.go"],
       "fuzz": ["FuzzGroupComposition"],
       "differential_evidence": [],
       "differential_classification": "not assessed",
-      "public_behavior": ["Middleware order and exclusions are deterministic while runtime handler ownership stays with callers."]
+      "public_behavior": ["Middleware order is deterministic, inherited layers are non-excludable by default, and runtime handler ownership stays with callers."]
     },
     {
       "id": "ROUTER-DEC-009",

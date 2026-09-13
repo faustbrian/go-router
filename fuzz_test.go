@@ -11,7 +11,7 @@ import (
 	"sync"
 	"testing"
 
-	router "github.com/faustbrian/go-router"
+	router "github.com/faustbrian/go-router/v2"
 )
 
 func TestConcurrentDispatchIntrospectionAndGeneration(t *testing.T) {

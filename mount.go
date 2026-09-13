@@ -60,7 +60,7 @@ func (b *Builder) Mount(prefix string, handler http.Handler, options MountOption
 		methods = []string{
 			http.MethodDelete, http.MethodGet, http.MethodHead,
 			http.MethodOptions, http.MethodPatch, http.MethodPost,
-			http.MethodPut, http.MethodTrace,
+			http.MethodPut,
 		}
 	}
 	pattern := boundary + "/{mount...}"
