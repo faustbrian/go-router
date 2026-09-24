@@ -15,8 +15,12 @@ cannot silently relabel inherited policy.
 ## Excluding generic middleware
 
 Give router middleware stable names and list an inherited name in
-`Route.ExcludeMiddleware`. Exclusion is resolved at compilation and appears in
-the route table; no global alias registry is consulted.
+`Route.ExcludeMiddleware`. The middleware owner must also set
+`ExclusionPolicy: router.MiddlewareExclusionAllowed`; the secure zero value
+rejects route attempts to exclude inherited layers. Use the opt-in only for
+non-security layers such as diagnostics. Exclusion is resolved during group
+registration or compilation and appears in the route table; no global alias
+registry is consulted.
 
 ## Exact roots and subtrees
 

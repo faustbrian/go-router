@@ -625,14 +625,18 @@ Authority URL: https://raw.githubusercontent.com/golang/go/go1.26.6/src/net/http
   by reflection, apply route-first, silently deduplicate, or freeze explicit
   values at compile. Frameworks differ and often own recovery implicitly.
 - **Selected behavior, security and resource consequences, compatibility and wire consequences:**
-  Execute router, outer group, inner
-  group, then route middleware; unwind in reverse. Named exclusions remove only
-  inherited layers and are explicit on the route. Nil, duplicate resolved names,
-  and nil constructed handlers fail before publication. Serving panics,
+  Execute router, outer group, inner group, then route middleware; unwind in
+  reverse. Inherited middleware is non-excludable by default, and only its
+  owner may opt it into named route exclusion. Attempts to exclude required
+  middleware fail before publication. Nil, duplicate resolved names, and nil
+  constructed handlers also fail before publication. Serving panics,
   cancellation, short circuits, re-entry, writer capabilities, and handler
   lifecycle remain caller-owned; no recovery or wrapper is injected.
 - **Evidence, public surface, upstream, and reconsideration:**
   `TestMiddlewareOrderAndIntrospectionAreStableAndImmutable`,
+  `TestRouteCannotExcludeRouterMiddlewareByDefault`,
+  `TestRouteMayExcludeExplicitlyExcludableRouterMiddleware`,
+  `TestRouteCannotExcludeGroupMiddlewareByDefault`,
   `TestRouteMayExcludeNamedGroupMiddleware`,
   `TestMiddlewareMayShortCircuitPanicCancelAndReenter`, and
   `TestRouterPreservesResponseWriterOptionalInterfaces` cover middleware APIs.
@@ -663,20 +667,24 @@ Authority URL: https://raw.githubusercontent.com/golang/go/go1.26.6/src/net/http
     "Freeze explicit values during compilation"
   ],
   "peer_behavior": "No maintained peer comparison is currently assessed for the complete middleware ownership contract.",
-  "selected_behavior": "Execute router, outer group, inner group, then route middleware and unwind in reverse; named exclusions remove inherited layers only; fail compilation on nil or duplicate resolved middleware; leave serving panics, cancellation, short circuits, re-entry, writer capabilities, and handler lifetime caller-owned.",
+  "selected_behavior": "Execute router, outer group, inner group, then route middleware and unwind in reverse; inherited middleware is non-excludable by default and only its owner may opt it into named route exclusion; fail registration or compilation when a route excludes required middleware and fail compilation on nil or duplicate resolved middleware; leave serving panics, cancellation, short circuits, re-entry, writer capabilities, and handler lifetime caller-owned.",
   "rationale": "Explicit deterministic composition preserves ordinary net/http ownership without hidden recovery or service location.",
-  "security_consequences": "No implicit recovery, reflection, or alias lookup can hide faults or select unexpected middleware.",
+  "security_consequences": "Independently owned route definitions cannot remove inherited authentication, authorization, or other security middleware unless the middleware owner explicitly makes that layer excludable; no implicit recovery, reflection, or alias lookup can hide faults or select unexpected middleware.",
   "resource_consequences": "Middleware counts and identifiers are bounded before handler construction.",
-  "compatibility_consequences": "Order, exclusion, panic, cancellation, and writer behavior are stable public contracts.",
+  "compatibility_consequences": "Order, opt-in exclusion, panic, cancellation, and writer behavior are stable public contracts; existing intentional exclusions require the inherited layer to set MiddlewareExclusionAllowed.",
   "wire_consequences": "Middleware response order is the reverse of request order and short circuits remain middleware-owned.",
   "executable_evidence": [
     "TestMiddlewareOrderAndIntrospectionAreStableAndImmutable",
+    "TestRouteCannotExcludeRouterMiddlewareByDefault",
+    "TestRouteMayExcludeExplicitlyExcludableRouterMiddleware",
+    "TestRouteCannotExcludeGroupMiddlewareByDefault",
     "TestRouteMayExcludeNamedGroupMiddleware",
     "TestMiddlewareMayShortCircuitPanicCancelAndReenter",
     "TestRouterPreservesResponseWriterOptionalInterfaces"
   ],
   "fixture_evidence": [
-    "middleware_hardening_test.go"
+    "middleware_hardening_test.go",
+    "group_test.go"
   ],
   "fuzz_evidence": [
     "FuzzGroupComposition"
@@ -684,6 +692,7 @@ Authority URL: https://raw.githubusercontent.com/golang/go/go1.26.6/src/net/http
   "interoperability_evidence": [],
   "public_apis": [
     "Middleware",
+    "MiddlewareExclusionPolicy",
     "NamedMiddleware",
     "Route.ExcludeMiddleware",
     "Router.ServeHTTP"

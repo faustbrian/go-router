@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 
-	router "github.com/faustbrian/go-router"
+	router "github.com/faustbrian/go-router/v2"
 )
 
 func ExampleBuilder() {

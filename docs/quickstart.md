@@ -27,7 +27,9 @@ Use `WithMiddleware` for router-wide layers and `Route.Middleware` for route
 layers. A `NamedMiddleware` exposes a stable identifier in `Router.Routes`.
 Request order is router, outer group, inner group, route; responses unwind in
 reverse. `Route.ExcludeMiddleware` can explicitly remove named inherited
-layers.
+layers only when the layer owner sets
+`ExclusionPolicy: router.MiddlewareExclusionAllowed`. Keep authentication and
+authorization middleware at the default non-excludable policy.
 
 ## Mount
 
@@ -35,6 +37,8 @@ Call `Mount` with any `http.Handler`. `StripPrefix` clones the request and URL
 before stripping, while retaining the original `RequestURI`. A nested compiled
 router, JSON-RPC endpoint, webhook, health probe, metrics endpoint, or debug
 endpoint remains an ordinary handler with caller-owned lifecycle.
+Default mounts omit TRACE; include it in `MountOptions.Methods` only when the
+mounted handler deliberately supports it.
 
 ## Named path and URL
 

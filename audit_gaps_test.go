@@ -10,7 +10,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	router "github.com/faustbrian/go-router"
+	router "github.com/faustbrian/go-router/v2"
 )
 
 func TestFineGrainedInputByteBudgets(t *testing.T) {

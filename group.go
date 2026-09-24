@@ -108,6 +108,9 @@ func (b *Builder) composeGroup(options GroupOptions) (groupState, error) {
 		if middleware.Middleware == nil {
 			return groupState{}, b.routeError(ErrInvalidRoute, "middleware", "", "invalid group middleware")
 		}
+		if !validMiddlewareExclusionPolicy(middleware.ExclusionPolicy) {
+			return groupState{}, b.routeError(ErrInvalidRoute, "middleware", "", "invalid middleware exclusion policy")
+		}
 		if middleware.Name != "" && !validName(middleware.Name) {
 			return groupState{}, b.routeError(ErrInvalidRoute, "middleware", "", "invalid group middleware")
 		}
@@ -139,7 +142,10 @@ func (b *Builder) flattenRoute(route Route) (Route, error) {
 	}
 	flattened.Path = joinPrefix(b.group.pathPrefix, flattened.Path)
 	flattened.Name = b.group.namePrefix + flattened.Name
-	groupMiddleware := excludeInheritedMiddleware(b.group.middleware, flattened.ExcludeMiddleware)
+	groupMiddleware, denied := excludeInheritedMiddleware(b.group.middleware, flattened.ExcludeMiddleware)
+	if denied != "" {
+		return Route{}, b.routeError(ErrInvalidRoute, "middleware", route.Source, "cannot exclude required middleware")
+	}
 	flattened.Middleware = append(groupMiddleware, flattened.Middleware...)
 	metadata, err := mergeMetadata(b.group.metadata, flattened.Metadata, b.limits)
 	if err != nil {
@@ -153,7 +159,7 @@ func (b *Builder) flattenRoute(route Route) (Route, error) {
 	return flattened, nil
 }
 
-func excludeInheritedMiddleware(middleware []NamedMiddleware, exclusions []string) []NamedMiddleware {
+func excludeInheritedMiddleware(middleware []NamedMiddleware, exclusions []string) ([]NamedMiddleware, string) {
 	excluded := make(map[string]struct{}, len(exclusions))
 	for _, name := range exclusions {
 		excluded[name] = struct{}{}
@@ -162,12 +168,15 @@ func excludeInheritedMiddleware(middleware []NamedMiddleware, exclusions []strin
 	for _, candidate := range middleware {
 		if candidate.Name != "" {
 			if _, skip := excluded[candidate.Name]; skip {
+				if candidate.ExclusionPolicy != MiddlewareExclusionAllowed {
+					return nil, candidate.Name
+				}
 				continue
 			}
 		}
 		filtered = append(filtered, candidate)
 	}
-	return filtered
+	return filtered, ""
 }
 
 func (b *Builder) validatePrefix(prefix string) error {

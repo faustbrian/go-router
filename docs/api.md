@@ -38,7 +38,10 @@ in `Request.PathValue`.
 `RouteInfo` exposes name, explicit methods, host, path pattern, wildcard names,
 resolved middleware identifiers, copied metadata, documentation, operation,
 and source. `NamedMiddleware` pairs a visible name with the standard
-`Middleware` function shape.
+`Middleware` function shape and an `ExclusionPolicy`. The zero-value
+`MiddlewareExclusionDenied` keeps inherited middleware mandatory;
+`MiddlewareExclusionAllowed` lets a route explicitly exclude that named
+router or group layer.
 
 ## Generation
 

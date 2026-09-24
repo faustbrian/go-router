@@ -5,11 +5,25 @@ import "net/http"
 // Middleware is the standard HTTP middleware shape.
 type Middleware = func(http.Handler) http.Handler
 
+// MiddlewareExclusionPolicy controls whether a route may remove an inherited
+// middleware layer. The zero value denies exclusion so security-sensitive
+// middleware remains enforced unless its owner explicitly opts out.
+type MiddlewareExclusionPolicy uint8
+
+const (
+	// MiddlewareExclusionDenied keeps inherited middleware non-excludable.
+	MiddlewareExclusionDenied MiddlewareExclusionPolicy = iota
+	// MiddlewareExclusionAllowed permits a route to exclude a named inherited layer.
+	MiddlewareExclusionAllowed
+)
+
 // NamedMiddleware makes a middleware layer visible through introspection.
 // Name may be empty when exclusion and duplicate detection are not needed.
+// ExclusionPolicy defaults to MiddlewareExclusionDenied.
 type NamedMiddleware struct {
-	Name       string
-	Middleware Middleware
+	Name            string
+	Middleware      Middleware
+	ExclusionPolicy MiddlewareExclusionPolicy
 }
 
 // Route is an explicit route descriptor. Builder.Register copies every slice

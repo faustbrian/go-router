@@ -5,6 +5,29 @@ by [`monitoring.json`](monitoring.json). A monitoring digest changes only after
 the corresponding upstream delta has been classified against the applicable
 specification decisions.
 
+## 2026-09-24: RFC 9110 errata
+
+- **Authority:** `rfc9110-errata`
+- **URL:** https://errata.rfc-editor.org/search/?rfc_number=9110&presentation=records
+- **Previous SHA-256:**
+  `1f6790054c0cdb2f2a70a94fa2b9c73b09a4ee0578a32b4a3006ed0ecfaac86d`
+- **Reviewed SHA-256:**
+  `cec32fd170146656d933f627b512f2e027ae5c3592f5ec7760c3627493b30505`
+- **Retrieved and reviewed:** 2026-09-24
+- **Applicability:** No router decision changes.
+- **Disposition:** Behavior-neutral for the selected HTTP method, authority,
+  routing, and response contracts.
+
+[Errata ID 9164](https://errata.rfc-editor.org/eid9164/) was reported on
+2026-09-07 against RFC 9110 Appendix A. It clarifies that the collected ABNF
+normalizes equivalent notation beyond list-rule expansion. The report itself
+says the transformations define the same language; its status is Reported,
+not Verified. The router does not extract Appendix A into a parser or derive
+its method, authority, routing, or response decisions from that rendering.
+The pinned RFC 9110 source, selected decisions, and executable behavior remain
+unchanged. Reconsider if the erratum becomes Verified or the router begins
+using the collected ABNF as a machine-readable authority.
+
 ## 2026-09-06: Go releases feed
 
 - **Authority:** `go-releases`

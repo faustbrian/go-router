@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	router "github.com/faustbrian/go-router"
+	router "github.com/faustbrian/go-router/v2"
 )
 
 func TestRouterPreservesResponseWriterOptionalInterfaces(t *testing.T) {
@@ -51,6 +51,54 @@ func TestRouterPreservesResponseWriterOptionalInterfaces(t *testing.T) {
 	}
 	if writer.flushes != 1 || writer.hijacks != 1 || writer.pushes != 1 {
 		t.Fatalf("optional calls: flush=%d hijack=%d push=%d", writer.flushes, writer.hijacks, writer.pushes)
+	}
+}
+
+func TestRouteCannotExcludeRouterMiddlewareByDefault(t *testing.T) {
+	t.Parallel()
+
+	builder := router.New(router.WithMiddleware(router.NamedMiddleware{
+		Name:       "authenticate",
+		Middleware: func(next http.Handler) http.Handler { return next },
+	}))
+	mustRegister(t, builder, router.Route{
+		Methods:           []string{http.MethodGet},
+		Path:              "/private",
+		Handler:           http.NotFoundHandler(),
+		ExcludeMiddleware: []string{"authenticate"},
+	})
+
+	if _, err := builder.Compile(); !errors.Is(err, router.ErrInvalidRoute) {
+		t.Fatalf("compile exclusion of required router middleware: got %v", err)
+	}
+}
+
+func TestRouteMayExcludeExplicitlyExcludableRouterMiddleware(t *testing.T) {
+	t.Parallel()
+
+	called := false
+	builder := router.New(router.WithMiddleware(router.NamedMiddleware{
+		Name:            "diagnostics",
+		ExclusionPolicy: router.MiddlewareExclusionAllowed,
+		Middleware: func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+				called = true
+				next.ServeHTTP(writer, request)
+			})
+		},
+	}))
+	mustRegister(t, builder, router.Route{
+		Methods:           []string{http.MethodGet},
+		Path:              "/health",
+		Handler:           http.NotFoundHandler(),
+		ExcludeMiddleware: []string{"diagnostics"},
+	})
+	mustCompile(t, builder).ServeHTTP(
+		httptest.NewRecorder(),
+		httptest.NewRequest(http.MethodGet, "/health", nil),
+	)
+	if called {
+		t.Fatal("explicitly excludable router middleware ran")
 	}
 }
 

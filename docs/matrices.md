@@ -90,7 +90,7 @@ errors before serving.
 | Middleware behavior | Contract |
 | --- | --- |
 | Normal chain | Request order is router, outer group, inner group, route; response order is reversed |
-| Named exclusion | Removes matching inherited router or group middleware, never route-local middleware |
+| Named exclusion | Removes matching inherited router or group middleware only when that layer is explicitly excludable; otherwise registration or compilation fails |
 | Duplicate resolved name | Compile error before any handler graph is published |
 | Nil middleware or nil returned handler | Typed error before serving |
 | Short circuit | Downstream middleware and handler are not called |
@@ -106,6 +106,7 @@ errors before serving.
 | Surface | Contract |
 | --- | --- |
 | Mount boundary | One explicit remainder-wildcard route |
+| Default methods | DELETE, GET, HEAD, OPTIONS, PATCH, POST, and PUT; TRACE requires explicit opt-in |
 | Strip prefix | Uses a cloned request URL; preserves the caller URL, `RequestURI`, and escaped suffix across encoded literal prefixes |
 | Nested router | Caller-owned handler; preserves outer path values, with inner names winning collisions |
 | Relative path | Requires every path wildcard exactly once and rejects host parameters |

@@ -15,8 +15,10 @@ programming model. It adds deterministic composition, groups, names, safe URL
 generation, metadata, introspection, mounts, and route-scoped middleware while
 keeping handlers as ordinary `http.Handler` values.
 
-The module is active and has a stable v1 API. The minimum supported toolchain
-is Go 1.27.0. The package has no runtime dependencies and no global router,
+The latest published module has a stable v1 API. This source tree prepares an
+unpublished v2 release for the security changes in the Unreleased changelog;
+existing consumers must remain on v1 until v2 is tagged. The minimum supported
+toolchain is Go 1.27.0. The package has no runtime dependencies and no global router,
 reflection discovery, controller resolver, container, session, template, or
 application lifecycle.
 
@@ -26,9 +28,14 @@ for the shared design language and related packages.
 
 ## Installation
 
+Install the released v1 module:
+
 ```sh
 go get github.com/faustbrian/go-router@v1
 ```
+
+After v2 is published, new and migrated consumers will use
+`github.com/faustbrian/go-router/v2`.
 
 ## Five-minute start
 

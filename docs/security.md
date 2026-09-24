@@ -8,9 +8,21 @@ defends against path confusion, encoded-slash structural injection, traversal,
 open redirects, authority injection, wildcard ambiguity, method confusion,
 route shadowing, metadata disclosure, and resource exhaustion.
 
+Independently owned or plugin-provided routes cannot remove inherited
+middleware by naming it. Router and group middleware is non-excludable by
+default; the middleware owner must explicitly set
+`ExclusionPolicy: MiddlewareExclusionAllowed` for a layer that routes may
+remove. Authentication, authorization, tenancy, audit, and other security
+boundaries should keep the zero-value `MiddlewareExclusionDenied` policy.
+
 It does not authenticate callers, authorize actions, terminate TLS, interpret
 forwarding headers, recover application panics, limit bodies, or apply security
 headers. Those concerns belong to explicit middleware and server policy.
+
+`Mount` defaults to the common DELETE, GET, HEAD, OPTIONS, PATCH, POST, and PUT
+methods. TRACE is accepted only when a caller explicitly includes it in
+`MountOptions.Methods`, so mounting an independently owned handler does not
+silently expand it onto TRACE.
 
 ## Paths and escaping
 
@@ -45,13 +57,22 @@ only. Diagnostics normalize invalid UTF-8, replace control characters, remain
 single-line, and cannot split a UTF-8 encoding at a byte limit. Input is
 truncated before normalization and sanitization, so diagnostic work is bounded
 by output size. The router never logs. Introspection excludes handler pointers
-and function names. All
-caller-controlled collections and output sizes are bounded.
+and function names, but route names, patterns, middleware identifiers,
+metadata, documentation, operation names, and source labels are intentionally
+visible through `Routes` and `MatchedRoute`. Do not store credentials, tokens,
+personal data, or other secrets in those fields. All caller-controlled
+collections and output sizes are bounded.
 
 Dispatch rejects oversized method tokens before token scanning and oversized
 raw or escaped request targets before route matching. Middleware identifiers,
 exclusions, group names, mount prefixes, schemes, and generation route names
 are length-checked before parsing, normalization, or map lookup.
+
+`WithLimits` is trusted startup configuration, not a request-derived input.
+Every custom value must be positive, but the package does not impose a second
+hard ceiling on caller-selected budgets. Raise defaults only from measured
+route-table and request requirements; unbounded or attacker-controlled custom
+limits can weaken the router's denial-of-service protections.
 
 The production package starts no goroutines and never registers handlers on
 the process-global `http.DefaultServeMux`. The blocking safety gate rejects

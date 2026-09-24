@@ -3,7 +3,10 @@
 `DefaultLimits` supplies a complete positive construction budget. Callers may
 replace it with `WithLimits`; every field must remain positive. Limits are
 checked before a compiled router is published and generation limits are checked
-before a URL is returned.
+before a URL is returned. Treat custom limits as trusted startup policy: the
+router validates positivity but does not cap caller-selected maxima. Do not
+derive them from requests or plugin route metadata, and raise a default only to
+a measured application requirement.
 
 | Budget | Default | Applies to |
 | --- | ---: | --- |

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	router "github.com/faustbrian/go-router"
+	router "github.com/faustbrian/go-router/v2"
 )
 
 func TestRegisterValidatesAndCopiesRoute(t *testing.T) {
@@ -95,6 +95,7 @@ func TestRegisterReturnsTypedErrors(t *testing.T) {
 		{name: "bad name", route: router.Route{Name: " users", Methods: []string{"GET"}, Path: "/x", Handler: handler}, kind: router.ErrInvalidRoute, field: "name"},
 		{name: "bad host", route: router.Route{Methods: []string{"GET"}, Host: "https://example.com", Path: "/x", Handler: handler}, kind: router.ErrInvalidRoute, field: "host"},
 		{name: "nil middleware", route: router.Route{Methods: []string{"GET"}, Path: "/x", Handler: handler, Middleware: []router.NamedMiddleware{{Name: "nil"}}}, kind: router.ErrInvalidRoute, field: "middleware"},
+		{name: "invalid middleware exclusion policy", route: router.Route{Methods: []string{"GET"}, Path: "/x", Handler: handler, Middleware: []router.NamedMiddleware{{Middleware: func(next http.Handler) http.Handler { return next }, ExclusionPolicy: 255}}}, kind: router.ErrInvalidRoute, field: "middleware"},
 	}
 
 	for _, test := range tests {
