@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"slices"
 	"testing"
 
 	router "github.com/faustbrian/go-router/v2"
@@ -212,6 +213,10 @@ func TestMountValidationAndConflictReturnErrors(t *testing.T) {
 func TestMountDefaultMethodsDoNotExposeTRACE(t *testing.T) {
 	t.Parallel()
 
+	wantMethods := []string{
+		http.MethodDelete, http.MethodGet, http.MethodHead, http.MethodOptions,
+		http.MethodPatch, http.MethodPost, http.MethodPut,
+	}
 	called := false
 	builder := router.New()
 	if err := builder.Mount("/assets", http.HandlerFunc(func(http.ResponseWriter, *http.Request) {
@@ -219,11 +224,16 @@ func TestMountDefaultMethodsDoNotExposeTRACE(t *testing.T) {
 	}), router.MountOptions{}); err != nil {
 		t.Fatalf("mount: %v", err)
 	}
+	compiled := mustCompile(t, builder)
+	routes := compiled.Routes()
+	if len(routes) != 1 || !slices.Equal(routes[0].Methods, wantMethods) {
+		t.Fatalf("default mount methods: %#v", routes)
+	}
 	response := httptest.NewRecorder()
-	mustCompile(t, builder).ServeHTTP(response, httptest.NewRequest(http.MethodTrace, "/assets/file", nil))
+	compiled.ServeHTTP(response, httptest.NewRequest(http.MethodTrace, "/assets/file", nil))
 
-	if called || response.Code != http.StatusMethodNotAllowed {
-		t.Fatalf("default TRACE dispatch: called=%t status=%d", called, response.Code)
+	if called || response.Code != http.StatusMethodNotAllowed || response.Header().Get("Allow") != "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT" {
+		t.Fatalf("default TRACE dispatch: called=%t status=%d allow=%q", called, response.Code, response.Header().Get("Allow"))
 	}
 
 	explicitCalled := false
@@ -234,8 +244,13 @@ func TestMountDefaultMethodsDoNotExposeTRACE(t *testing.T) {
 	}), router.MountOptions{Methods: []string{http.MethodTrace}}); err != nil {
 		t.Fatalf("explicit TRACE mount: %v", err)
 	}
+	explicitCompiled := mustCompile(t, explicit)
+	explicitRoutes := explicitCompiled.Routes()
+	if len(explicitRoutes) != 1 || !slices.Equal(explicitRoutes[0].Methods, []string{http.MethodTrace}) {
+		t.Fatalf("explicit mount methods: %#v", explicitRoutes)
+	}
 	explicitResponse := httptest.NewRecorder()
-	mustCompile(t, explicit).ServeHTTP(explicitResponse, httptest.NewRequest(http.MethodTrace, "/assets/file", nil))
+	explicitCompiled.ServeHTTP(explicitResponse, httptest.NewRequest(http.MethodTrace, "/assets/file", nil))
 	if !explicitCalled || explicitResponse.Code != http.StatusNoContent {
 		t.Fatalf("explicit TRACE dispatch: called=%t status=%d", explicitCalled, explicitResponse.Code)
 	}
