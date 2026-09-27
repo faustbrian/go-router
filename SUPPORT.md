@@ -11,7 +11,8 @@ for adoption questions and design exploration. Use the private process in
 [`SECURITY.md`](SECURITY.md) for vulnerabilities.
 
 Support covers released module versions according to
-[`COMPATIBILITY.md`](COMPATIBILITY.md). The stable v1 line is supported; users
-on an older v1 patch should reproduce against the latest published v1 release
-before reporting a defect. The `main` branch is unreleased development, not a
+[`COMPATIBILITY.md`](COMPATIBILITY.md) and [`SECURITY.md`](SECURITY.md). Users
+on an older patch should reproduce against the latest published release of
+their supported major before reporting a defect. The `main` branch is
+unreleased development, not a
 supported deployment target.

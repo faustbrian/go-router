@@ -1149,5 +1149,5 @@ No known material ambiguity in the current public surface is unresolved.
 Dynamic routes, regex matching, CONNECT tunneling, proxy trust, implicit IDNA,
 controller resolution, model binding, sessions, CSRF, templates, dependency
 injection, authentication, authorization, RPC dispatch, and server lifecycle
-are outside the v1 claim. Adding one requires a new decision before runtime
-implementation.
+are outside the current public claim. Adding one requires a new decision before
+runtime implementation.

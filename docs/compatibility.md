@@ -1,9 +1,10 @@
 # Standard-library Compatibility
 
 The immutable v1 API baseline remains in `api/baseline.txt`. Active source and
-compatibility checks use the distinct `api/v2.txt` baseline for the pending,
-unpublished `github.com/faustbrian/go-router/v2` module. Public installation
-guidance remains on released v1 until the first v2 tag exists.
+compatibility checks use the distinct `api/v2.txt` baseline for
+`github.com/faustbrian/go-router/v2`. Adopt v2.0.0 only when its public tag and
+module artifacts are available; preparation and a changelog date alone do not
+prove publication.
 
 The minimum supported Go release and development toolchain are 1.27.0, the
 latest stable release when this contract was written.
@@ -45,7 +46,7 @@ registration is used.
 | URL generation | Not provided | Named, bounded, component-escaped generation | Supply every wildcard explicitly |
 | Middleware | Caller wraps handlers manually | Visible router/group/route composition; inherited layers are non-excludable by default | Ordering and exclusion policy are frozen at compile time; explicitly opt non-security layers into exclusion |
 | Mounted methods | Caller registers each pattern | Omitted method list registers DELETE, GET, HEAD, OPTIONS, PATCH, POST, and PUT, but not TRACE | Include TRACE explicitly only when the mounted handler supports it |
-| CONNECT | Authority-form may be matched by a method pattern | Registration is rejected in v1 | Mount CONNECT handling outside this router |
+| CONNECT | Authority-form may be matched by a method pattern | Registration is rejected | Mount CONNECT handling outside this router |
 
 The 404 and 405 compatibility assertions use automatic OPTIONS disabled,
 because enabling it deliberately changes both OPTIONS dispatch and the methods

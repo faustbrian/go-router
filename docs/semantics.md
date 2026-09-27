@@ -1,6 +1,6 @@
 # Routing Semantics
 
-This document freezes the v1 behavior contract before implementation. Terms
+This document defines the current v2 behavior contract. Terms
 such as MUST and SHOULD are used as described by RFC 2119 and RFC 8174.
 
 ## Registration and compilation
@@ -26,7 +26,7 @@ nesting, methods, wildcards, pattern and name bytes, metadata, middleware,
 parameters, query values, and generated URL bytes. Invalid configuration never
 needs a recovery handler at request time.
 
-CONNECT is rejected during registration because v1 does not dispatch
+CONNECT is rejected during registration because the router does not dispatch
 authority-form targets. Exact default budgets are listed in
 [Resource Limits](limits.md).
 
@@ -69,7 +69,7 @@ default 404 and 405 responses match `ServeMux`, including body and `Allow`.
 
 The asterisk-form target is supported only for `OPTIONS *`; disabling automatic
 OPTIONS sends it to the explicit not-found handler. CONNECT authority form is
-rejected in v1. Origin-form and absolute-form requests are accepted only when
+rejected. Origin-form and absolute-form requests are accepted only when
 `net/http` supplies a valid URL and authority.
 
 ## Groups and middleware
@@ -82,8 +82,13 @@ are rejected instead of silently overriding values.
 
 Middleware executes router-wide, outer group, inner group, then route order on
 the request path; response unwinding is the reverse. Named inherited
-router-wide or group middleware may be excluded only by an explicit route
-descriptor. Nil and duplicate resolved middleware are registration errors.
+router-wide or group middleware is non-excludable by default. A route may name
+an inherited layer in `ExcludeMiddleware` only when that layer's owner sets
+`NamedMiddleware.ExclusionPolicy` to `MiddlewareExclusionAllowed`. The zero
+value `MiddlewareExclusionDenied` keeps inherited layers mandatory; attempts
+to exclude them fail group registration or compilation. Authentication,
+authorization, tenancy, and audit layers should retain the default policy.
+Nil or duplicate resolved middleware causes compilation to fail.
 
 Middleware is the ordinary `func(http.Handler) http.Handler` shape. The router
 does not recover handler or middleware panics and does not wrap the response
@@ -98,6 +103,8 @@ while the escaped suffix remains in `URL.RawPath`. The original request target
 remains in `RequestURI`. Mounting does not imply authentication, authorization,
 middleware, or lifecycle ownership. A compiled router is mounted as an
 ordinary `http.Handler`.
+The default mount methods are DELETE, GET, HEAD, OPTIONS, PATCH, POST, and PUT.
+TRACE is accepted only when explicitly included in `MountOptions.Methods`.
 Nested compiled routers preserve non-conflicting outer `Request.PathValue`
 entries; the innermost route wins when a wildcard name is reused.
 

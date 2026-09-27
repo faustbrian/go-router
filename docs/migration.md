@@ -1,13 +1,12 @@
 # Migration
 
-## Pending v2 migration
+## From v1 to v2
 
-The security changes below are being prepared on the
-`github.com/faustbrian/go-router/v2` module path. No v2 artifact is published
-yet, so released consumers must remain on `github.com/faustbrian/go-router`
-v1 without local replacements. After v2 is tagged, update imports and the
-module requirement together, then apply the middleware and TRACE migrations
-described below.
+The security changes below use the `github.com/faustbrian/go-router/v2`
+module path at v2.0.0 and require Go 1.27.0. Once the public tag and module
+artifacts are available, update imports and the module requirement together,
+then apply the middleware and TRACE migrations below. Before publication,
+retain released v1 without local replacements or pseudo-versions.
 
 ## From `http.ServeMux`
 

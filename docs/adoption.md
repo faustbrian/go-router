@@ -1,11 +1,15 @@
 # Adoption Guides
 
-This source tree prepares an unpublished v2 release. Existing applications,
-including the owned `go-http-middleware/integration/siblings` and
-`go-service/integration/reference-http` consumers, must remain on released v1
-without local replacements until v2 is published. Their v2 migration and
-compatibility verification are release blockers, not evidence available from
-the unpublished source tree.
+Adopt `github.com/faustbrian/go-router/v2` at v2.0.0 once its public tag and
+module artifacts are available. Until then, existing applications can retain
+released v1 without local replacements or pseudo-versions. A prepared source
+tree or changelog date alone does not establish publication.
+
+The owned `go-http-middleware/integration/siblings` and
+`go-service/integration/reference-http` consumers must migrate and verify
+compatibility against the public v2 module before their migration is complete.
+Candidate-source integration checks are not public-consumer evidence. Follow
+[migration](migration.md) for inherited middleware and mount-default changes.
 
 ## REST-like APIs
 

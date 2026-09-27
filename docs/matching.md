@@ -16,7 +16,7 @@ The default follows canonical and subtree redirects from `ServeMux`.
 trailing slash. Encoded slash remains within a wildcard and its decoded value
 is available through `Request.PathValue`.
 
-Only `OPTIONS *` supports asterisk-form. CONNECT authority-form is rejected in
-v1. Invalid methods, URLs, and authorities receive 400. Matching uses a derived
+Only `OPTIONS *` supports asterisk-form. CONNECT authority-form is rejected.
+Invalid methods, URLs, and authorities receive 400. Matching uses a derived
 request only to attach package-owned route context; it does not mutate the
 caller's URL or replace parameter access.

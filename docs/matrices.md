@@ -1,6 +1,6 @@
 # Behavior Matrices
 
-These tables summarize the v1 behavior frozen by the executable unit,
+These tables summarize the current v2 behavior frozen by the executable unit,
 differential, security, fuzz, race, and property tests.
 
 ## Request outcomes
@@ -83,7 +83,9 @@ chain and returns a defensive `RouteInfo` copy.
 | Paths | Validated prefix joins without `path.Clean` | Empty and dot segments are errors |
 | Failed group callback | No routes are published | Parent remains usable |
 
-Named middleware exclusion is an explicit route field. Nil middleware,
+Named middleware exclusion is an explicit route field and requires the
+inherited layer owner's `MiddlewareExclusionAllowed` opt-in; the default
+`MiddlewareExclusionDenied` policy keeps inherited layers mandatory. Nil middleware,
 duplicate resolved names, and a middleware layer returning a nil handler are
 errors before serving.
 
