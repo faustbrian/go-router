@@ -1,6 +1,6 @@
 # Release Process
 
-The root module uses `github.com/faustbrian/go-router/v2` and root `v2.0.0`
+The root module uses `github.com/faustbrian/go-router/v2` and root `v2.x.y`
 tags on main. Eligibility does not establish publication. The owned
 `go-http-middleware/integration/siblings` and
 `go-service/integration/reference-http` consumers must migrate and verify

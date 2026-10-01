@@ -5,6 +5,15 @@ All notable changes to this project are documented in this file.
 The format is based on Keep a Changelog, and this project adheres to Semantic
 Versioning.
 
+## [Unreleased]
+
+## [2.0.1] - 2026-10-02
+
+### Changed
+
+- Adopt the pinned `go-library-tools` v1.8.5 reusable verification workflow
+  while retaining the independently pinned v1.6.2 CLI.
+
 ## [2.0.0] - 2026-09-27
 
 ### Changed
@@ -201,5 +210,7 @@ Versioning.
 - Document and freeze every dispatch difference caused by automatic OPTIONS,
   unsupported method misses, host extensions, redirect policy, and CONNECT.
 
+[Unreleased]: https://github.com/faustbrian/go-router/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/faustbrian/go-router/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/faustbrian/go-router/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/faustbrian/go-router/releases/tag/v1.0.0
