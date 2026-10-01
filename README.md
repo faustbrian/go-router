@@ -5,7 +5,7 @@
 [![Coverage](https://img.shields.io/badge/coverage-100%25_required-blue)](CONTRIBUTING.md#verification)
 [![Mutation](https://img.shields.io/badge/mutation-100%25_required-blue)](CONTRIBUTING.md#verification)
 [![Documentation](https://img.shields.io/badge/docs-checked_in_CI-blue)](docs/)
-[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-router.svg)](https://pkg.go.dev/github.com/faustbrian/go-router)
+[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-router/v2.svg)](https://pkg.go.dev/github.com/faustbrian/go-router/v2)
 [![Release](https://img.shields.io/github/v/release/faustbrian/go-router?sort=semver)](https://github.com/faustbrian/go-router/releases)
 [![Go](https://img.shields.io/badge/go-1.27.0-00ADD8?logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -15,9 +15,9 @@ programming model. It adds deterministic composition, groups, names, safe URL
 generation, metadata, introspection, mounts, and route-scoped middleware while
 keeping handlers as ordinary `http.Handler` values.
 
-The latest published module has a stable v1 API. This source tree prepares an
-unpublished v2 release for the security changes in the Unreleased changelog;
-existing consumers must remain on v1 until v2 is tagged. The minimum supported
+This source tree defines v2.0.0 with fail-closed inherited middleware and mount
+defaults. Its changelog date does not establish publication; installation
+requires the public tag and module artifacts. The minimum supported
 toolchain is Go 1.27.0. The package has no runtime dependencies and no global router,
 reflection discovery, controller resolver, container, session, template, or
 application lifecycle.
@@ -28,14 +28,15 @@ for the shared design language and related packages.
 
 ## Installation
 
-Install the released v1 module:
+Install v2.0.0 once its public tag and module artifacts are available:
 
 ```sh
-go get github.com/faustbrian/go-router@v1
+go get github.com/faustbrian/go-router/v2@v2.0.0
 ```
 
-After v2 is published, new and migrated consumers will use
-`github.com/faustbrian/go-router/v2`.
+Before those artifacts are available, existing consumers can retain the
+released `github.com/faustbrian/go-router@v1.0.0` module. Do not bypass that
+boundary with a local replacement or pseudo-version.
 
 ## Five-minute start
 

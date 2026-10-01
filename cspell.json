@@ -200,6 +200,7 @@
     "errgroup",
     "errorlint",
     "eventoutbox",
+    "excludable",
     "evictable",
     "failback",
     "faustbrian",

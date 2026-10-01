@@ -1,7 +1,7 @@
 # Compatibility Policy
 
 This repository publishes one independently releasable root Go module. It uses
-semantic versioning and root tags of the form `v<version>`. The stable v1 line
+semantic versioning and root tags of the form `v<version>`. Each stable major
 keeps patch and minor releases backward compatible; incompatible exported API
 or documented behavior changes require a new major version.
 

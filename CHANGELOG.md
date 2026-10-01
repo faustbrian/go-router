@@ -5,13 +5,13 @@ All notable changes to this project are documented in this file.
 The format is based on Keep a Changelog, and this project adheres to Semantic
 Versioning.
 
-## [Unreleased]
+## [2.0.0] - 2026-09-27
 
 ### Changed
 
 - **Breaking:** Move the source module to the `/v2` import path for the
-  fail-closed middleware-exclusion and mount-default changes. No v2 artifact is
-  published yet; existing consumers must remain on v1 until release.
+  fail-closed middleware-exclusion and mount-default changes. Adopt the new
+  module only after its public tag and module artifacts are available.
 - Make inherited router and group middleware non-excludable by default; layer
   owners must explicitly opt non-security middleware into route exclusion.
   `NamedMiddleware` now includes `ExclusionPolicy`; consumers using positional
@@ -201,5 +201,5 @@ Versioning.
 - Document and freeze every dispatch difference caused by automatic OPTIONS,
   unsupported method misses, host extensions, redirect policy, and CONNECT.
 
-[Unreleased]: https://github.com/faustbrian/go-router/compare/v1.0.0...HEAD
+[2.0.0]: https://github.com/faustbrian/go-router/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/faustbrian/go-router/releases/tag/v1.0.0

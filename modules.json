@@ -34,9 +34,9 @@
         }
       ],
       "purpose": "`router` is an explicit, immutable HTTP router built on Go's `net/http` programming model. It adds deterministic composition, groups, names, safe URL generation, metadata, introspection, mounts, and route-scoped middleware while keeping handlers as ordinary `http.Handler` values.",
-      "lifecycle": "planned",
+      "lifecycle": "stable",
       "kind": "public library",
-      "releasable": false,
+      "releasable": true,
       "family": "service-edge",
       "family_label": "Service Edge",
       "family_description": "Request-edge policy, identity, access decisions, routing, middleware, and process lifecycle.",
@@ -90,8 +90,8 @@
           "github.com/faustbrian/go-router/v2": "Use for explicit immutable HTTP route composition, dispatch, introspection, mounts, and named URL generation while retaining ordinary net/http handler ownership.",
           "github.com/faustbrian/go-router/v2/routertest": "Use in tests for deterministic router compilation, serving, status assertions, and route-table inspection."
         },
-        "lifecycle_status": "planned",
-        "maturity": "preview",
+        "lifecycle_status": "active",
+        "maturity": "stable",
         "construction_styles": [
           "builder-compile",
           "functional-options",
@@ -142,14 +142,14 @@
           "examples": "docs/quickstart.md",
           "faq": "docs/faq.md",
           "changelog": "CHANGELOG.md",
-          "pkg_go_dev": "https://pkg.go.dev/github.com/faustbrian/go-router",
+          "pkg_go_dev": "https://pkg.go.dev/github.com/faustbrian/go-router/v2",
           "ecosystem_index": "https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/README.md"
         },
         "known_good_compatibility_sets": [],
         "delivery": {
-          "implementation": "not-started",
-          "hardening": "not-started",
-          "release": "not-started"
+          "implementation": "in-progress",
+          "hardening": "in-progress",
+          "release": "in-progress"
         }
       },
       "gates": {
