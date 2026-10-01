@@ -15,8 +15,8 @@ programming model. It adds deterministic composition, groups, names, safe URL
 generation, metadata, introspection, mounts, and route-scoped middleware while
 keeping handlers as ordinary `http.Handler` values.
 
-This source tree defines v2.0.0 with fail-closed inherited middleware and mount
-defaults. Its changelog date does not establish publication; installation
+This source tree defines v2.0.1, retaining the fail-closed inherited
+middleware and mount defaults introduced in v2.0.0. Its changelog date does not establish publication; installation
 requires the public tag and module artifacts. The minimum supported
 toolchain is Go 1.27.0. The package has no runtime dependencies and no global router,
 reflection discovery, controller resolver, container, session, template, or
@@ -28,15 +28,16 @@ for the shared design language and related packages.
 
 ## Installation
 
-Install v2.0.0 once its public tag and module artifacts are available:
+Install v2.0.1 once its public tag and module artifacts are available:
 
 ```sh
-go get github.com/faustbrian/go-router/v2@v2.0.0
+go get github.com/faustbrian/go-router/v2@v2.0.1
 ```
 
-Before those artifacts are available, existing consumers can retain the
-released `github.com/faustbrian/go-router@v1.0.0` module. Do not bypass that
-boundary with a local replacement or pseudo-version.
+Existing v2 applications can retain released v2.0.0 until the patch is
+published. Legacy consumers can retain
+`github.com/faustbrian/go-router@v1.0.0`; do not bypass publication with a
+local replacement or pseudo-version.
 
 ## Five-minute start
 
