@@ -63,4 +63,5 @@ diagnostics; never parse error text. Rendered messages are single-line valid
 UTF-8 with control characters replaced.
 
 The Go documentation on every exported declaration is authoritative for exact
-signatures. `make docs` verifies exported documentation and Markdown links.
+signatures. `make -f verification/package.mk docs` verifies exported
+documentation and Markdown links.

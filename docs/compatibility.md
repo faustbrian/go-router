@@ -6,8 +6,8 @@ compatibility checks use the distinct `api/v2.txt` baseline for
 module artifacts are available; preparation and a changelog date alone do not
 prove publication.
 
-The minimum supported Go release and development toolchain are 1.27.0, the
-latest stable release when this contract was written.
+The minimum supported Go release remains 1.27.0, the latest stable release
+when this contract was written. Development and ordinary CI use Go 1.27.2.
 
 ## Preserved behavior
 

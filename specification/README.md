@@ -34,7 +34,8 @@ the append-only [`upstream-reviews.md`](upstream-reviews.md) history.
 | ROUTER-DEC-012 | RFC 3986 authority syntax | `TestAbsoluteURLGenerationValidatesBaseHostAndQuery`, `TestGenerationEnforcesOutputAndQueryLimits`, `TestTrustedBaseAuthorityIsBounded` | `specification/interoperability.tsv` |
 | ROUTER-DEC-013 | RFC 9110 status and resource policy | `TestRegisterEnforcesLimitsAndBoundsDiagnostics`, `TestFineGrainedInputByteBudgets`, `TestDiagnosticsAreSingleLineValidUTF8`, `TestCustomErrorHandlerOwnsPartialResponsesAndPanics`, `TestEveryLimitMustBePositive` | Not assessed |
 
-Run the focused map and evidence check with `make conformance`. For an update,
+Run the focused map and evidence check with
+`make -f verification/package.mk conformance`. For an update,
 verify provenance and digest, review Go routing changes and RFC errata, update
 the structured and human decisions, preserve decision history, update tests,
 then change the manifest. A digest change alone MUST NOT silently change
