@@ -28,7 +28,7 @@ behavior cannot silently select policy.
 
 Selected mutation gates must finish with zero surviving viable mutants.
 
-Do not add package-local workflows, permanent replacements, machine-specific
+Do not fork shared verification workflows, add permanent replacements, machine-specific
 paths, bypass flags, broad mutation exclusions, or aggregate quality metrics
 that hide a failing package.
 
@@ -82,6 +82,30 @@ The ordinary scheduled CI route remains bounded and separately monitors
 authoritative specification sources online. Report unavailable or failing checks
 without claiming release readiness. CI/configuration-only changes do not
 require a library release.
+
+## Selected Monthly Assurance
+
+The owner-level [selected-assurance caller](.github/workflows/assurance.yml) is
+configured for main only, on day 12 of each month at 06:13 UTC. It selects one
+of the 6 current declared root-module fuzz targets using the shared UTC-week
+rotation, with 30 seconds of active exploration. The selected risks are:
+route-pattern compilation, named-route round trips, hostile request targets,
+host matching, group composition and generated URL dispatch.
+The root targets use in-process httptest requests and recorders, not deployed
+HTTP services. Conformance against the pinned routing authority and the
+disposable released-v1/candidate-v2 integration consumer remain separate
+full/manual qualification routes.
+
+Base-free ordinary checks execute deterministic seeds, not active exploration;
+committed-range CI selects affected active smoke. Manual assurance requires an
+exact anchored selector from the root fuzz operation in `.golib.yaml`, for
+example `^FuzzRequestTargets$`.
+Empty, unknown and malformed selections refuse. The shared job bounds setup
+and execution to ten minutes, active workers and CPU to two, owned memory to
+2 GiB, native output to 1 MiB and private-cache lifetime. Failure, cancellation,
+exhausted budgets and cleanup refusal remain attributable failures. This lane
+does not run mutation or replace Required, original full fuzz budgets,
+explicit `make check-full`, or relevant release qualification.
 
 ## Adding A Module
 
