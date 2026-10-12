@@ -236,6 +236,8 @@ func TestMiddlewareConstructorPanicPropagatesAfterValidation(t *testing.T) {
 	_, _ = builder.Compile()
 }
 
+// optionalWriter is a sequential identity/capability probe, not a transport.
+// Optional methods count calls and intentionally perform no real network work.
 type optionalWriter struct {
 	header  http.Header
 	status  int

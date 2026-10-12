@@ -10,7 +10,12 @@ import (
 	"strings"
 )
 
-// Compile validates the complete route set and returns an immutable router.
+// Compile validates the complete route set and returns an immutable router,
+// freezing this builder only on success. Nil/frozen builders, conflicts,
+// duplicate names, invalid middleware and excess budgets return typed Error
+// categories with no partial Router. Pattern conflicts are checked before any
+// middleware constructor runs, but a later constructor failure can leave earlier
+// callback side effects; those effects and all callback panics are caller-owned.
 func (b *Builder) Compile() (*Router, error) {
 	if b == nil {
 		return nil, &Error{Kind: ErrCompileState, Field: "builder", Detail: "nil builder"}
@@ -35,6 +40,8 @@ func (b *Builder) Compile() (*Router, error) {
 	if err := validateHostPatternConflicts(routes, b.routeError); err != nil {
 		return nil, err
 	}
+	// ROUTER-DEC-002: let ServeMux decide whole-table path conflicts before
+	// constructing decorators. Registration order must not choose a winner.
 	if err := validateServeMuxConflicts(routes); err != nil {
 		return nil, err
 	}
@@ -309,6 +316,9 @@ func registerPattern(mux *http.ServeMux, pattern string, handler http.Handler, s
 	return nil
 }
 
+// Only package-owned synchronous registration errors cross the panic-to-error
+// boundary. Runtime faults and arbitrary panics must not look like user policy
+// refusals (ROUTER-DEC-002; compiler/coverage regression fixtures).
 func controlledRegistrationError(recovered any) (string, bool) {
 	registrationError, ok := recovered.(error)
 	if !ok {
@@ -320,6 +330,9 @@ func controlledRegistrationError(recovered any) (string, bool) {
 	return fmt.Sprint(registrationError), true
 }
 
+// Reverse construction produces forward request order and reverse response
+// unwinding. There is deliberately no recovery or cleanup protocol for caller
+// constructors; a nil result prevents publication, not their earlier effects.
 func applyMiddleware(handler http.Handler, middleware []NamedMiddleware, source string) (http.Handler, error) {
 	for index := len(middleware) - 1; index >= 0; index-- {
 		handler = middleware[index].Middleware(handler)

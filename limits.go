@@ -1,31 +1,61 @@
 package router
 
-// Limits bounds all construction and URL-generation inputs. Zero values are
-// invalid; start with DefaultLimits and adjust individual budgets.
+// Limits bounds construction, dispatch and URL-generation inputs. Every field
+// must be positive; start with DefaultLimits and adjust trusted startup budgets.
+// WithLimits validates positivity but imposes no ceiling on caller-selected
+// maxima. Limits are retained by value and do not bound callback execution.
+// Byte budgets count bytes, not runes; limits reject rather than truncate input.
 type Limits struct {
-	MaxRoutes             int
-	MaxGroups             int
-	MaxGroupDepth         int
-	MaxMethodsPerRoute    int
-	MaxMethodBytes        int
-	MaxWildcardsPerRoute  int
-	MaxWildcardNameBytes  int
-	MaxPatternBytes       int
-	MaxHostBytes          int
-	MaxNameBytes          int
-	MaxSourceBytes        int
-	MaxOperationBytes     int
+	// MaxRoutes caps retained flattened descriptors, counting each mount once.
+	MaxRoutes int
+	// MaxGroups caps successful group callbacks, including empty/nested groups.
+	MaxGroups int
+	// MaxGroupDepth caps nested child-builder depth.
+	MaxGroupDepth int
+	// MaxMethodsPerRoute caps explicitly registered methods per descriptor.
+	MaxMethodsPerRoute int
+	// MaxMethodBytes caps each registered or dispatched method token in bytes.
+	MaxMethodBytes int
+	// MaxWildcardsPerRoute caps combined host/path wildcard occurrences; the
+	// path count also includes the {$} end marker.
+	MaxWildcardsPerRoute int
+	// MaxWildcardNameBytes caps each wildcard/generation parameter name.
+	MaxWildcardNameBytes int
+	// MaxPatternBytes caps paths, composed group prefixes and mount patterns.
+	MaxPatternBytes int
+	// MaxHostBytes caps registered route/group host patterns, not trusted bases.
+	MaxHostBytes int
+	// MaxNameBytes caps route/group names, middleware names and exclusions.
+	MaxNameBytes int
+	// MaxSourceBytes caps registered source labels before retention.
+	MaxSourceBytes int
+	// MaxOperationBytes caps retained operation identifiers.
+	MaxOperationBytes int
+	// MaxDocumentationBytes caps retained descriptive route text.
 	MaxDocumentationBytes int
-	MaxMetadataEntries    int
-	MaxMetadataKeyBytes   int
+	// MaxMetadataEntries caps composed metadata entry counts before merging.
+	MaxMetadataEntries int
+	// MaxMetadataKeyBytes caps each non-empty metadata key.
+	MaxMetadataKeyBytes int
+	// MaxMetadataValueBytes caps each metadata value; empty values are valid.
 	MaxMetadataValueBytes int
-	MaxMiddleware         int
+	// MaxMiddleware caps middleware collections, exclusions and resolved depth.
+	MaxMiddleware int
+	// MaxRequestTargetBytes caps RequestURI, decoded/raw/escaped path and raw
+	// query components plus escaped-path/query bytes; excess dispatch returns 414.
 	MaxRequestTargetBytes int
-	MaxURLParameters      int
-	MaxURLParameterBytes  int
-	MaxQueryValues        int
-	MaxQueryBytes         int
-	MaxGeneratedURLBytes  int
+	// MaxURLParameters caps compiled wildcard names, generation descriptors and
+	// total supplied segment values, including remainder segments.
+	MaxURLParameters int
+	// MaxURLParameterBytes caps cumulative raw parameter-name and value bytes.
+	MaxURLParameterBytes int
+	// MaxQueryValues caps query key count and total entries; an empty value list
+	// consumes one entry even though encoding emits no pair.
+	MaxQueryValues int
+	// MaxQueryBytes caps cumulative raw query key/value bytes before encoding.
+	MaxQueryBytes int
+	// MaxGeneratedURLBytes caps final escaped relative/absolute output bytes.
+	MaxGeneratedURLBytes int
 }
 
 // DefaultLimits returns conservative production budgets.

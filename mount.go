@@ -8,20 +8,36 @@ import (
 
 // MountOptions configures an explicit standard-handler mount.
 type MountOptions struct {
-	Name          string
-	Methods       []string
-	Host          string
-	Middleware    []NamedMiddleware
-	Metadata      map[string]string
+	// Name is the optional stable name of the single generated remainder route.
+	Name string
+	// Methods selects explicit uppercase HTTP methods. Empty defaults to DELETE,
+	// GET, HEAD, OPTIONS, PATCH, POST and PUT; TRACE requires explicit inclusion.
+	Methods []string
+	// Host limits the mount to a Route.Host pattern; empty inherits group policy.
+	Host string
+	// Middleware appends mount-local layers after router/group middleware.
+	Middleware []NamedMiddleware
+	// Metadata supplies copied bounded route data with no inherited key overrides.
+	Metadata map[string]string
+	// Documentation is optional bounded text exposed in RouteInfo.
 	Documentation string
-	Operation     string
-	Source        string
-	StripPrefix   bool
+	// Operation is an optional bounded identifier exposed in RouteInfo.
+	Operation string
+	// Source is an optional bounded diagnostic label, not redacted secret data.
+	Source string
+	// StripPrefix gives the handler a cloned request and URL with the decoded
+	// prefix removed and escaped suffix preserved. RequestURI remains original.
+	// False leaves the selected request URL view unchanged.
+	StripPrefix bool
 }
 
 // Mount registers handler below an explicit path boundary. The mount is one
 // ordinary remainder-wildcard route and therefore follows the active redirect
-// policy for a request missing the boundary's trailing slash.
+// policy for a request missing the boundary's trailing slash. prefix must be a
+// non-empty absolute literal prefix; no implicit authentication or resource
+// lifecycle is added. Registration copies options' slices/maps, not handler
+// state. StripPrefix changes only the mounted request view; nested routers
+// preserve outer path values unless an inner wildcard reuses the name.
 func (b *Builder) Mount(prefix string, handler http.Handler, options MountOptions) error {
 	if b == nil {
 		return &Error{Kind: ErrCompileState, Field: "builder", Detail: "nil builder"}
@@ -109,6 +125,9 @@ func stripMountPrefix(boundary, decodedBoundary string, handler http.Handler) ht
 				rawPath = "/" + rawPath
 			}
 		}
+		// ROUTER-DEC-009: compare literal boundaries in decoded space but retain
+		// the escaped suffix. RequestURI remains the caller's wire target, so a
+		// nested handler must not treat it as the rewritten mounted URL.
 		clone := request.Clone(request.Context())
 		clonedURL := *request.URL
 		clonedURL.Path = path

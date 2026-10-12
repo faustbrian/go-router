@@ -68,6 +68,8 @@ func TestConcurrentDispatchIntrospectionAndGeneration(t *testing.T) {
 	}
 }
 
+// FuzzRoutePatternCompilation bounds arbitrary path patterns and requires every
+// accepted descriptor to compile; malformed patterns may refuse without panic.
 func FuzzRoutePatternCompilation(f *testing.F) {
 	for _, pattern := range []string{"/", "/users/{id}", "/assets/{path...}", "/exact/{$}", "/a%2Fb", "/../x", "relative", "/{"} {
 		f.Add(pattern)
@@ -90,6 +92,8 @@ func FuzzRoutePatternCompilation(f *testing.F) {
 	})
 }
 
+// FuzzNamedRouteRoundTrip checks bounded raw segment data: every successful
+// escaped path must dispatch and recover the original single wildcard value.
 func FuzzNamedRouteRoundTrip(f *testing.F) {
 	for _, value := range []string{"simple", "a/b", "hello world", "åäö", "..", "", "a%2Fb", "line\nbreak"} {
 		f.Add(value)
@@ -118,6 +122,8 @@ func FuzzNamedRouteRoundTrip(f *testing.F) {
 	})
 }
 
+// FuzzRequestTargets feeds bounded targets admitted by net/http's parser into
+// dispatch and requires an HTTP-range status without panic, not acceptance.
 func FuzzRequestTargets(f *testing.F) {
 	for _, target := range []string{"/", "/x", "/x%2Fy", "/../x", "/a//b", "*"} {
 		f.Add(target)
@@ -147,6 +153,8 @@ func FuzzRequestTargets(f *testing.F) {
 	})
 }
 
+// FuzzHostMatching varies bounded request authorities against one host pattern;
+// malformed and unmatched hosts may refuse but must yield a valid HTTP status.
 func FuzzHostMatching(f *testing.F) {
 	for _, host := range []string{
 		"acme.example.com", "ACME.EXAMPLE.COM:8443", "a.b.example.com",
@@ -177,6 +185,9 @@ func FuzzHostMatching(f *testing.F) {
 	})
 }
 
+// FuzzGroupComposition bounds nested prefixes/names/hosts/metadata, checks that
+// failed callbacks publish nothing and successful compilation retains literal
+// composition and middleware order. It does not execute external collaborators.
 func FuzzGroupComposition(f *testing.F) {
 	for _, seed := range [][7]string{
 		{"/api", "/v1", "api.", "v1.", "{tenant}.example.com", "public", "one"},
@@ -241,6 +252,8 @@ func testJoinPrefix(prefix, path string) string {
 	return strings.TrimSuffix(prefix, "/") + path
 }
 
+// FuzzURLGenerationInputs bounds explicit origins, typed remainder data and query
+// input; successful URLs must parse as HTTP(S) and dispatch to the intended route.
 func FuzzURLGenerationInputs(f *testing.F) {
 	seeds := [][7]string{
 		{"asset", "path", "images|logo.svg", "https", "example.com", "q", "hello world"},
@@ -297,6 +310,8 @@ func FuzzURLGenerationInputs(f *testing.F) {
 	})
 }
 
+// BenchmarkCompileRoutes measures New, registration and compilation of 100
+// literal named GET routes, including descriptor/index allocation each iteration.
 func BenchmarkCompileRoutes(b *testing.B) {
 	handler := http.HandlerFunc(func(http.ResponseWriter, *http.Request) {})
 	b.ReportAllocs()
@@ -312,6 +327,8 @@ func BenchmarkCompileRoutes(b *testing.B) {
 	}
 }
 
+// BenchmarkDispatch measures one wildcard GET dispatch plus per-iteration
+// request cloning; registration/compilation and the no-op writer are outside time.
 func BenchmarkDispatch(b *testing.B) {
 	builder := router.New()
 	_ = builder.Register(router.Route{
@@ -328,6 +345,8 @@ func BenchmarkDispatch(b *testing.B) {
 	}
 }
 
+// BenchmarkURLGeneration measures one named path and parameter construction;
+// builder/compilation setup is outside b.Loop, and no absolute/query work occurs.
 func BenchmarkURLGeneration(b *testing.B) {
 	builder := router.New()
 	_ = builder.Register(router.Route{
@@ -341,6 +360,9 @@ func BenchmarkURLGeneration(b *testing.B) {
 	}
 }
 
+// BenchmarkMiddlewareDepth measures dispatch and request cloning with 16
+// identity constructors. They return next directly, so this does not measure
+// 16 executing decorator callbacks; registration/compilation is outside time.
 func BenchmarkMiddlewareDepth(b *testing.B) {
 	layers := make([]router.NamedMiddleware, 16)
 	for index := range layers {
@@ -361,6 +383,8 @@ func BenchmarkMiddlewareDepth(b *testing.B) {
 	}
 }
 
+// BenchmarkIntrospection measures a full copied table of 100 named literal
+// routes with one metadata entry each; registration/compilation is outside time.
 func BenchmarkIntrospection(b *testing.B) {
 	builder := router.New()
 	for index := range 100 {
@@ -377,6 +401,8 @@ func BenchmarkIntrospection(b *testing.B) {
 	}
 }
 
+// benchmarkWriter removes recorder body allocation from dispatch measurements;
+// it preserves only the header map and deliberately ignores status/body writes.
 type benchmarkWriter struct {
 	header http.Header
 }

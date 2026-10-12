@@ -16,19 +16,34 @@ import (
 type routeContextKey struct{}
 type pathValuesContextKey struct{}
 
-// RouteInfo is a safe immutable view of a compiled route. Methods, Parameters,
-// Middleware, and Metadata are copied whenever information crosses the API.
+// RouteInfo is a defensive snapshot of a compiled route, omitting handlers and
+// function identity. Its exported fields are mutable caller-owned data: changing
+// them does not change dispatch. Methods, Parameters, Middleware and Metadata
+// are independently copied whenever information crosses the API.
 type RouteInfo struct {
-	Name          string
-	Methods       []string
-	Host          string
-	Pattern       string
-	Parameters    []string
-	Middleware    []string
-	Metadata      map[string]string
+	// Name is the optional stable route name after group composition.
+	Name string
+	// Methods contains sorted explicitly registered methods, not implied HEAD
+	// or automatic OPTIONS additions.
+	Methods []string
+	// Host is the registered composed host pattern, not the request authority.
+	Host string
+	// Pattern is the composed path pattern, not the concrete requested path.
+	Pattern string
+	// Parameters lists host wildcards left-to-right, then path wildcards in
+	// pattern order, with no duplicate names.
+	Parameters []string
+	// Middleware lists resolved layers in request order; unnamed layers appear
+	// as empty strings, and excluded inherited layers are omitted.
+	Middleware []string
+	// Metadata is a copied descriptive map with the composed route entries.
+	Metadata map[string]string
+	// Documentation is the retained bounded descriptive text.
 	Documentation string
-	Operation     string
-	Source        string
+	// Operation is the retained optional identifier, not handler identity.
+	Operation string
+	// Source is the retained caller diagnostic label; it is not redacted.
+	Source string
 }
 
 type compiledHost struct {
@@ -38,7 +53,11 @@ type compiledHost struct {
 	redirects []*http.ServeMux
 }
 
-// Router is an immutable concurrency-safe compiled HTTP handler.
+// Router has immutable compiled indexes supporting concurrent ServeHTTP,
+// Routes, Path and URL calls. Construct it through Builder.Compile; its zero
+// value has no initialized routing budgets. Retained handlers/middleware must
+// provide their own concurrency safety and resource lifetime. Router starts no
+// goroutines, does no background I/O and has no Close operation.
 type Router struct {
 	limits           Limits
 	hosts            []compiledHost
@@ -51,7 +70,10 @@ type Router struct {
 	redirectPolicy   RedirectPolicy
 }
 
-// Routes returns the deterministic compiled route table.
+// Routes returns independent snapshots sorted by name, host, path and method
+// set, with methods sorted within each entry. It copies the full table and nested
+// collections, so cost is linear in the published data. A nil Router returns nil;
+// a compiled empty router returns a non-nil empty slice.
 func (r *Router) Routes() []RouteInfo {
 	if r == nil {
 		return nil
@@ -64,7 +86,9 @@ func (r *Router) Routes() []RouteInfo {
 }
 
 // MatchedRoute returns the route selected for request, when called from its
-// handler or middleware chain.
+// handler or middleware chain. It returns a defensive snapshot, or zero/false
+// for nil requests or absent package route context. Nested routers install their
+// own matched metadata; this function reports the context on the supplied view.
 func MatchedRoute(request *http.Request) (RouteInfo, bool) {
 	if request == nil {
 		return RouteInfo{}, false
@@ -76,7 +100,17 @@ func MatchedRoute(request *http.Request) (RouteInfo, bool) {
 	return cloneRouteInfo(info), true
 }
 
-// ServeHTTP dispatches one request without mutating compiled state.
+// ServeHTTP dispatches synchronously without mutating compiled state. It
+// rejects nil router/request/URL, invalid authorities/methods and CONNECT with
+// 400, and excess targets with 414, before route middleware or custom miss
+// handlers. It follows RedirectPolicy, explicit routes, automatic OPTIONS,
+// known-path 405, unsupported-method 501 and ordinary 404 in that order.
+//
+// Handlers receive standard PathValue entries and matched metadata on a derived
+// context. URL and RequestURI remain unchanged except for a mounted handler's
+// optional cloned URL view; ServeMux owns its ordinary request path-value state.
+// Supply a non-nil writer. The router does not recover panics, wrap the writer,
+// stop canceled requests automatically or constrain caller callback execution.
 func (r *Router) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if r == nil || request == nil || request.URL == nil {
 		writeError(writer, http.StatusBadRequest, "bad request")
@@ -172,6 +206,10 @@ func (r *Router) serveNotFound(writer http.ResponseWriter, request *http.Request
 	http.NotFound(writer, request)
 }
 
+// Route context must surround the entire resolved middleware chain. Preserve
+// outer path values on mounted routers except names owned by this inner route;
+// copying a separate parameter API would diverge from Request.PathValue.
+// ROUTER-DEC-009/010 and mount_policy_test.go protect the collision rule.
 func (r *Router) matchingHandler(infoIndex int, hostParameters []string, handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		info := cloneRouteInfo(r.table[infoIndex])
@@ -290,6 +328,10 @@ func redirectRoot(pattern string) string {
 	return ""
 }
 
+// ROUTER-DEC-001 pins Go 1.26.6 redirect serialization rather than the producer
+// toolchain's form. Putting the cleaned escaped path in Path deliberately escapes
+// existing percent signs again; switching to RawPath changes Location on the
+// wire. TestPinnedServeMuxRedirectsPreserveGo126EscapedPathBehavior freezes it.
 func servePinnedCanonicalRedirect(writer http.ResponseWriter, request *http.Request) {
 	redirect := &url.URL{
 		Path:     canonicalPath(request.URL.EscapedPath()),
@@ -298,6 +340,8 @@ func servePinnedCanonicalRedirect(writer http.ResponseWriter, request *http.Requ
 	http.RedirectHandler(redirect.String(), http.StatusTemporaryRedirect).ServeHTTP(writer, request)
 }
 
+// The pinned subtree form uses decoded Path, unlike canonical redirects above.
+// Preserve that observable distinction and the original query (ROUTER-DEC-001).
 func servePinnedSubtreeRedirect(writer http.ResponseWriter, request *http.Request) {
 	redirect := &url.URL{
 		Path:     canonicalPath(request.URL.Path) + "/",

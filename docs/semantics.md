@@ -119,4 +119,5 @@ and is deterministic.
 Absolute generation accepts an explicit trusted scheme and authority. It does
 not inspect requests or forwarding headers. Schemes are limited to `http` and
 `https`; authorities are validated, contain no user information or control
-characters, and must satisfy the configured trusted-host policy.
+characters, and are subject to the fixed authority byte ceiling. Validation is
+syntactic; deciding that an origin is trusted remains caller policy.

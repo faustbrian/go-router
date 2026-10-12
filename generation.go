@@ -17,7 +17,9 @@ const (
 )
 
 // URLParameter is an explicitly typed named-route generation input. Construct
-// values with Param or Remainder.
+// values with Param or Remainder. The zero value is invalid during generation;
+// values are reusable because constructors retain strings or copy segment slices
+// and generation never mutates them.
 type URLParameter struct {
 	name      string
 	values    []string
@@ -25,14 +27,18 @@ type URLParameter struct {
 	oversized bool
 }
 
-// Param supplies one path segment or host label.
+// Param supplies one path segment or host label. It defers name/value validation
+// to Path or URL. Path separators inside an otherwise valid segment are escaped
+// as data, not expanded into remainder segments.
 func Param(name, value string) URLParameter {
 	return URLParameter{name: name, values: []string{value}, kind: segmentParameter}
 }
 
 // Remainder supplies explicit path segments for a remainder wildcard. Inputs
 // above the package hard ceiling are rejected during generation without being
-// copied.
+// copied. Smaller slices are defensively copied; strings remain immutable.
+// Generation requires at least one segment, rejects empty/dot/slash-only segments
+// and NUL/CR/LF, and still applies the router's lower parameter and byte budgets.
 func Remainder(name string, segments ...string) URLParameter {
 	if len(segments) > maxRemainderSegments {
 		return URLParameter{name: name, kind: remainderParameter, oversized: true}
@@ -40,13 +46,19 @@ func Remainder(name string, segments ...string) URLParameter {
 	return URLParameter{name: name, values: append([]string(nil), segments...), kind: remainderParameter}
 }
 
-// BaseURL is an immutable validated absolute-URL base.
+// BaseURL is an immutable absolute-URL origin constructed by NewBaseURL. Its
+// zero value is invalid for URL. Validation is syntactic, not a decision that
+// the origin is authorized or reachable; the caller owns that trust policy.
 type BaseURL struct {
 	scheme string
 	host   string
 }
 
-// NewBaseURL validates and trusts one explicit HTTP or HTTPS authority.
+// NewBaseURL validates one caller-trusted HTTP or HTTPS scheme and authority.
+// It lowercases the scheme and accepts bounded ASCII authorities without
+// userinfo, URL paths, controls or malformed ports. Authority spelling is retained;
+// DNS resolution, IDNA conversion and proxy trust are not performed. Invalid
+// syntax returns ErrGeneration; fixed byte ceilings return ErrLimitExceeded.
 func NewBaseURL(scheme, authority string) (BaseURL, error) {
 	if len(scheme) > len("https") {
 		return BaseURL{}, generationError(ErrLimitExceeded, "scheme", "scheme is too long")
@@ -73,7 +85,13 @@ type generationRoute struct {
 }
 
 // Path generates a relative escaped path for a named route. Host wildcard
-// values are intentionally not accepted by relative generation.
+// values are intentionally not accepted by relative generation. Supply each path
+// wildcard exactly once with the appropriate Param or Remainder kind; unknown,
+// duplicate, missing, unused or unsafe values return ErrInvalidParameter. Names
+// absent from the table return ErrGeneration, nil routers return ErrCompileState
+// and budget excess returns ErrLimitExceeded. Failures return an empty string.
+// Segments are escaped once with url.PathEscape (RFC 3986 sections 2.1/3.3;
+// ROUTER-DEC-011), including literal percent and separator bytes as data.
 func (r *Router) Path(name string, parameters ...URLParameter) (string, error) {
 	if r == nil {
 		return "", generationError(ErrCompileState, "router", "nil compiled router")
@@ -103,7 +121,13 @@ func (r *Router) Path(name string, parameters ...URLParameter) (string, error) {
 }
 
 // URL generates an absolute URL using a validated explicit base. A route host
-// replaces the base hostname while retaining its trusted explicit port.
+// replaces the base hostname while retaining its trusted explicit port. No
+// request or forwarding header supplies authority. Parameters obey Path's error
+// rules and additionally require every host wildcard; a zero base or unknown name
+// returns ErrGeneration. Nil query is accepted. Query keys are sorted by
+// url.Values.Encode, values retain supplied order, and the query is not mutated;
+// callers must not mutate its maps/slices concurrently. Empty value lists count
+// toward admission budgets but emit nothing. Failures return an empty string.
 func (r *Router) URL(name string, base BaseURL, query url.Values, parameters ...URLParameter) (string, error) {
 	if r == nil {
 		return "", generationError(ErrCompileState, "router", "nil compiled router")
@@ -174,6 +198,8 @@ func collectParameters(parameters []URLParameter, limits Limits) (map[string]URL
 		if values > limits.MaxURLParameters {
 			return nil, generationError(ErrLimitExceeded, "parameters", "parameter value count exceeded")
 		}
+		// Count raw names and every remainder value before escaping expands data.
+		// MaxURLParameters caps both descriptors and total supplied segment values.
 		for _, value := range parameter.values {
 			bytes += len(value)
 			if bytes > limits.MaxURLParameterBytes {
@@ -344,6 +370,8 @@ func validateQuery(values url.Values, limits Limits) error {
 		if bytes > limits.MaxQueryBytes {
 			return generationError(ErrLimitExceeded, "query", "query bytes exceeded")
 		}
+		// An empty list emits no query pair but still consumes one admission
+		// slot. Otherwise many empty keys could bypass the count budget.
 		if len(entries) == 0 {
 			count++
 		} else {

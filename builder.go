@@ -8,10 +8,15 @@ import (
 	"strings"
 )
 
-// Option configures a Builder.
+// Option configures a Builder synchronously during New. Options run in order;
+// built-in validation errors are retained for Register, Group, Mount or Compile.
+// Custom options own their effects and panics and must not retain the builder
+// for concurrent mutation.
 type Option func(*Builder)
 
-// WithLimits replaces all construction and generation limits.
+// WithLimits replaces all construction, dispatch and generation limits. Every
+// field must be positive; positivity does not cap caller-selected maxima.
+// An invalid value is retained as ErrLimitExceeded for subsequent operations.
 func WithLimits(limits Limits) Option {
 	return func(builder *Builder) {
 		if !limits.valid() {
@@ -22,7 +27,11 @@ func WithLimits(limits Limits) Option {
 	}
 }
 
-// Builder owns mutable startup-time registration state.
+// Builder owns mutable startup-time registration state and is not safe for
+// concurrent use. Construct it with New; its zero value has no valid budgets.
+// A successful Compile freezes registration, groups, mounts and recompilation.
+// Failed compilation leaves descriptors retained but publishes no Router;
+// rebuilding is necessary to remove or replace a conflicting descriptor.
 type Builder struct {
 	limits           Limits
 	routes           []Route
@@ -38,14 +47,20 @@ type Builder struct {
 	compiled         bool
 }
 
-// WithMiddleware sets router-wide middleware in request execution order.
+// WithMiddleware replaces router-wide middleware in request execution order.
+// New copies the final slice after applying all options, not the callback state.
+// Middleware constructors run during Compile; invalid names, duplicate resolved
+// names and nil functions/returned handlers prevent successful publication.
 func WithMiddleware(middleware ...NamedMiddleware) Option {
 	return func(builder *Builder) {
 		builder.globalMiddleware = middleware
 	}
 }
 
-// New creates an empty single-owner route builder.
+// New creates an empty single-owner builder with DefaultLimits, automatic
+// OPTIONS enabled and FollowRedirects. It always returns a builder: nil options
+// and invalid built-in settings are deferred errors, not constructor panics.
+// Custom option panics propagate.
 func New(options ...Option) *Builder {
 	builder := &Builder{limits: DefaultLimits(), automaticOptions: true, redirectPolicy: FollowRedirects}
 	for _, option := range options {
@@ -74,7 +89,10 @@ func New(options ...Option) *Builder {
 	return builder
 }
 
-// WithNotFound replaces the minimal default 404 handler.
+// WithNotFound replaces the default 404 handler. Nil, including a typed nil,
+// becomes a deferred ErrInvalidRoute. This handler runs outside route middleware
+// and owns its response, blocking, cancellation and panics; malformed requests
+// bypass it.
 func WithNotFound(handler http.Handler) Option {
 	return func(builder *Builder) {
 		if isNilHandler(handler) {
@@ -86,7 +104,9 @@ func WithNotFound(handler http.Handler) Option {
 }
 
 // WithMethodNotAllowed replaces the minimal default 405 handler. The router
-// sets Allow before invoking it.
+// sets Allow before invoking it. Nil, including a typed nil, becomes a deferred
+// ErrInvalidRoute. It runs outside route middleware and owns its response,
+// blocking, cancellation and panics; malformed requests bypass it.
 func WithMethodNotAllowed(handler http.Handler) Option {
 	return func(builder *Builder) {
 		if isNilHandler(handler) {
@@ -97,7 +117,9 @@ func WithMethodNotAllowed(handler http.Handler) Option {
 	}
 }
 
-// WithAutomaticOPTIONS controls package-generated OPTIONS responses.
+// WithAutomaticOPTIONS controls package-generated OPTIONS responses, enabled
+// by default. Explicit OPTIONS routes win. Automation emits 204 with sorted Allow
+// for matching paths or OPTIONS *; disabling it sends OPTIONS * to not-found.
 func WithAutomaticOPTIONS(enabled bool) Option {
 	return func(builder *Builder) { builder.automaticOptions = enabled }
 }
@@ -106,7 +128,7 @@ func WithAutomaticOPTIONS(enabled bool) Option {
 type RedirectPolicy uint8
 
 const (
-	// FollowRedirects preserves the standard ServeMux redirect behavior.
+	// FollowRedirects retains the pinned Go 1.26.6 canonical/subtree redirect form.
 	FollowRedirects RedirectPolicy = iota
 	// RejectRedirects treats a match requiring canonicalization as not found.
 	RejectRedirects
@@ -123,7 +145,11 @@ func WithRedirectPolicy(policy RedirectPolicy) Option {
 	}
 }
 
-// Register validates and copies one route descriptor.
+// Register validates, flattens and copies one route descriptor without invoking
+// its handler or middleware. It rejects malformed or unsupported input, excess
+// budgets and frozen/nil builders with typed Error categories. Cross-route
+// conflicts and resolved middleware are checked by Compile. Successful routes
+// cannot subsequently be removed; copying collections does not copy callbacks.
 func (b *Builder) Register(route Route) error {
 	if b == nil {
 		return &Error{Kind: ErrCompileState, Field: "builder", Detail: "nil builder"}
@@ -166,7 +192,9 @@ func (b *Builder) Register(route Route) error {
 	return nil
 }
 
-// PendingRoutes returns copied descriptors registered before compilation.
+// PendingRoutes returns independent collection copies in registration order,
+// including after successful compilation. Handlers and middleware functions
+// remain shared caller-owned values. A nil builder returns nil.
 func (b *Builder) PendingRoutes() []Route {
 	if b == nil {
 		return nil

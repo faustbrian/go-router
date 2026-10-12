@@ -8,11 +8,22 @@ import (
 // GroupOptions composes a host, path and name prefix, middleware, and metadata
 // into every route registered by a group callback.
 type GroupOptions struct {
-	Host       string
+	// Host supplies the group hostname pattern. Non-empty nested/route hosts
+	// must match case-insensitively; empty inherits the outer host.
+	Host string
+	// PathPrefix joins literally to descendant paths. Empty or / adds no prefix;
+	// other values must be absolute literals without wildcards, dot segments,
+	// encoded separators, query/fragment syntax or repeated slashes.
 	PathPrefix string
+	// NamePrefix concatenates literally with descendant names without adding
+	// a separator; empty leaves them unchanged. The composed name is bounded.
 	NamePrefix string
+	// Middleware adds inherited layers in outer-to-inner request order. Slices
+	// are copied; callbacks are retained and excluded only with owner permission.
 	Middleware []NamedMiddleware
-	Metadata   map[string]string
+	// Metadata is copied and merged with descendants. Any repeated key is a
+	// conflict, even when the value agrees; values must satisfy the final budgets.
+	Metadata map[string]string
 }
 
 type groupState struct {
@@ -23,8 +34,13 @@ type groupState struct {
 	metadata   map[string]string
 }
 
-// Group transactionally flattens routes registered by define. If validation
-// or define fails, no route from the group is published to the parent.
+// Group transactionally flattens routes registered by define. If group-option
+// validation or define returns an error, no group route is published to the parent.
+// define must propagate failed child registrations; ignored errors do not abort it.
+// define runs synchronously on a child builder; do not mutate the parent from
+// inside it or retain the child for later registration. On normal callback return
+// the child is frozen, even after an error. Callback panics/effects are not
+// recovered or rolled back. Route-set conflicts remain Compile's responsibility.
 func (b *Builder) Group(options GroupOptions, define func(*Builder) error) error {
 	if b == nil {
 		return &Error{Kind: ErrCompileState, Field: "builder", Detail: "nil builder"}
@@ -48,6 +64,9 @@ func (b *Builder) Group(options GroupOptions, define func(*Builder) error) error
 	if err != nil {
 		return err
 	}
+	// Child capacity is the parent's remaining capacity, not a fresh allowance.
+	// Publish descriptors only after normal successful callback return; external
+	// effects inside define are not part of this transaction (ROUTER-DEC-007).
 	childLimits := b.limits
 	childLimits.MaxGroups = b.limits.MaxGroups - b.groups - 1
 	childLimits.MaxRoutes = b.limits.MaxRoutes - len(b.routes)
@@ -159,6 +178,10 @@ func (b *Builder) flattenRoute(route Route) (Route, error) {
 	return flattened, nil
 }
 
+// Check every colliding inherited name rather than selecting a representative:
+// one required security layer must veto exclusion of all layers with that name.
+// ROUTER-DEC-008 and TestRouteExclusionFailsClosedForCollidingInheritedNames
+// protect this owner-controlled boundary.
 func excludeInheritedMiddleware(middleware []NamedMiddleware, exclusions []string) ([]NamedMiddleware, string) {
 	excluded := make(map[string]struct{}, len(exclusions))
 	for _, name := range exclusions {

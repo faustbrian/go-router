@@ -8,6 +8,8 @@ import (
 	router "github.com/faustbrian/go-router/v2"
 )
 
+// recordingT deliberately lets Fatalf return so helpers' defensive failure
+// returns can be observed without terminating the actual test goroutine.
 type recordingT struct {
 	failures int
 }

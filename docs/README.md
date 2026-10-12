@@ -25,6 +25,7 @@
 
 ## Reference and maintenance
 
+- [Source documentation audit](source-documentation.md)
 - [Compatibility](compatibility.md)
 - [FAQ](faq.md)
 - [Migration](migration.md)

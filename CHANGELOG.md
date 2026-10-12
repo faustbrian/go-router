@@ -7,6 +7,12 @@ Versioning.
 
 ## [Unreleased]
 
+### Documentation
+
+- Clarify builder/callback ownership, defensive route snapshots, middleware
+  exclusions, URL-generation budgets and pinned redirect serialization in Go
+  API documentation without changing routing behavior.
+
 ## [2.0.1] - 2026-10-02
 
 ### Changed
