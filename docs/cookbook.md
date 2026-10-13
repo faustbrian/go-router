@@ -1,5 +1,7 @@
 # Cookbook
 
+[Documentation index](README.md)
+
 ## Custom errors
 
 Pass `WithNotFound` and `WithMethodNotAllowed` to `New`. The router sets `Allow`
@@ -33,3 +35,5 @@ remain with another handler.
 Use `routertest.MustCompile`, `Serve`, `AssertStatus`, and `RouteTable` for
 small consumer tests. Differential, fuzz, race, and security fixtures in this
 repository demonstrate deeper package tests.
+
+Continue with [API Reference](api.md).

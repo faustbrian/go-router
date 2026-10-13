@@ -1,5 +1,7 @@
 # API Reference
 
+[Documentation index](README.md)
+
 ## Construction
 
 - `New(options ...Option) *Builder` creates single-owner startup state.

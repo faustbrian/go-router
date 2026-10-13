@@ -1,5 +1,7 @@
 # Matching Reference
 
+[Documentation index](README.md)
+
 Patterns use Go 1.26 `ServeMux` path grammar: literals, `{name}`, `{name...}`,
 and `{$}`. Path specificity and conflicts are delegated to the standard
 library. Hosts add literal or single-label `{name}` matching; exact hosts win
@@ -20,3 +22,5 @@ Only `OPTIONS *` supports asterisk-form. CONNECT authority-form is rejected.
 Invalid methods, URLs, and authorities receive 400. Matching uses a derived
 request only to attach package-owned route context; it does not mutate the
 caller's URL or replace parameter access.
+
+Continue with [API Reference](api.md).

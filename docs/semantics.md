@@ -1,5 +1,7 @@
 # Routing Semantics
 
+[Documentation index](README.md)
+
 This document defines the current v2 behavior contract. Terms
 such as MUST and SHOULD are used as described by RFC 2119 and RFC 8174.
 

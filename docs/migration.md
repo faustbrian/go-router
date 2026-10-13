@@ -1,5 +1,7 @@
 # Migration
 
+[Documentation index](README.md)
+
 ## From v1 to v2
 
 The security changes below use the `github.com/faustbrian/go-router/v2`
@@ -49,3 +51,5 @@ registries with actual functions; and replace reverse-routing interpolation
 with `Param` or `Remainder`. Unsupported regex constraints should be validated
 inside a handler or at the application boundary. Compatibility with another
 router's precedence or redirect quirks is not implied.
+
+Continue with [API Reference](api.md).

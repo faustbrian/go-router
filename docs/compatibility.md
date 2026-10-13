@@ -1,10 +1,12 @@
 # Standard-library Compatibility
 
+[Documentation index](README.md)
+
 The immutable v1 API baseline remains in `api/baseline.txt`. Active source and
 compatibility checks use the distinct `api/v2.txt` baseline for
-`github.com/faustbrian/go-router/v2`. Adopt v2.0.0 only when its public tag and
-module artifacts are available; preparation and a changelog date alone do not
-prove publication.
+`github.com/faustbrian/go-router/v2`. The public v2 release line is available
+with this major-version module identity; review the migration guide before
+upgrading a v1 application.
 
 The minimum supported Go release remains 1.27.0, the latest stable release
 when this contract was written. Development and ordinary CI use Go 1.27.2.

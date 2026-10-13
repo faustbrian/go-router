@@ -1,5 +1,7 @@
 # FAQ
 
+[Documentation index](README.md)
+
 **Is this a framework?** No. It composes `http.Handler` values and owns no
 application lifecycle or dependency graph.
 
@@ -18,3 +20,5 @@ under application-owned rollout policy if dynamic configuration is required.
 **Who recovers panics?** Explicit middleware. The router only contains
 guards that convert controlled standard-library registration errors. Runtime,
 handler, and middleware panics propagate unchanged.
+
+Continue with [API Reference](api.md).

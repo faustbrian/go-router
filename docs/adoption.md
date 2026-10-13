@@ -1,5 +1,7 @@
 # Adoption Guides
 
+[Documentation index](README.md)
+
 Adopt `github.com/faustbrian/go-router/v2` at v2.0.0 once its public tag and
 module artifacts are available. Until then, existing applications can retain
 released v1 without local replacements or pseudo-versions. A prepared source

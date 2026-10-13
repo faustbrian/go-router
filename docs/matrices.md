@@ -1,5 +1,7 @@
 # Behavior Matrices
 
+[Documentation index](README.md)
+
 These tables summarize the current v2 behavior frozen by the executable unit,
 differential, security, fuzz, race, and property tests.
 
@@ -137,3 +139,5 @@ router and comparing the resulting `Request.PathValue` values.
 | Query separators, Unicode, or control text | Encoded by `url.Values.Encode` within configured budgets |
 | Extra trusted base port with a route host | Explicit port retained with the rendered route authority |
 | Generated path or URL over its output budget | `ErrLimitExceeded`; no partial string returned |
+
+Continue with [API Reference](api.md).

@@ -1,5 +1,7 @@
 # Five-minute Quickstarts
 
+[Documentation index](README.md)
+
 ## Route
 
 Create a `Builder`, call `Register` with explicit methods, path, and an
@@ -48,3 +50,5 @@ created by `NewBaseURL`; it never reads a request or forwarding header. Query
 values use `url.Values`.
 
 All quickstarts are compiled and executed in `example_test.go`.
+
+Continue with [API Reference](api.md).

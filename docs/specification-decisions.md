@@ -1,5 +1,7 @@
 # Router Specification Decisions
 
+[Documentation index](README.md)
+
 This register records observable routing choices where HTTP, URI syntax, Go's
 `net/http`, and package policy permit different outcomes. The package claims
 only the scoped behavior below; it does not implement an HTTP wire stack,
@@ -1151,3 +1153,5 @@ controller resolution, model binding, sessions, CSRF, templates, dependency
 injection, authentication, authorization, RPC dispatch, and server lifecycle
 are outside the current public claim. Adding one requires a new decision before
 runtime implementation.
+
+Continue with [API Reference](api.md).

@@ -2,9 +2,8 @@
 
 [![CI](https://github.com/faustbrian/go-router/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/faustbrian/go-router/actions/workflows/ci.yml)
 [![CodeQL](https://img.shields.io/badge/CodeQL-required-blue)](https://github.com/faustbrian/go-router/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/badge/coverage-100%25_required-blue)](CONTRIBUTING.md#verification)
 [![Mutation](https://img.shields.io/badge/mutation-local_or_scheduled-blue)](CONTRIBUTING.md#verification)
-[![Documentation](https://img.shields.io/badge/docs-checked_in_CI-blue)](docs/)
+[![Documentation](https://img.shields.io/badge/docs-structural_checks_in_CI-blue)](docs/)
 [![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-router/v2.svg)](https://pkg.go.dev/github.com/faustbrian/go-router/v2)
 [![Release](https://img.shields.io/github/v/release/faustbrian/go-router?sort=semver)](https://github.com/faustbrian/go-router/releases)
 [![Go](https://img.shields.io/badge/go-1.27.0-00ADD8?logo=go)](https://go.dev/)
@@ -15,27 +14,26 @@ programming model. It adds deterministic composition, groups, names, safe URL
 generation, metadata, introspection, mounts, and route-scoped middleware while
 keeping handlers as ordinary `http.Handler` values.
 
-This source tree defines v2.0.1, retaining the fail-closed inherited
-middleware and mount defaults introduced in v2.0.0. Its changelog date does not establish publication; installation
-requires the public tag and module artifacts. The minimum supported
-toolchain is Go 1.27.0. The package has no runtime dependencies and no global router,
+The published v2.0.1 release retains the fail-closed inherited middleware
+and mount defaults introduced in v2.0.0. The minimum supported toolchain
+is Go 1.27.0. The package has no runtime dependencies and no global router,
 reflection discovery, controller resolver, container, session, template, or
 application lifecycle.
 
-See the versioned [Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/README.md)
-and its [service-edge package guidance](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/design-language.md#package-families-and-selection)
+See the versioned [Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.8.4/docs/ecosystem/README.md)
+and its [service-edge package guidance](https://github.com/faustbrian/go-library-tools/blob/v1.8.4/docs/ecosystem/design-language.md#package-families-and-selection)
 for the shared design language and related packages.
 
 ## Installation
 
-Install v2.0.1 once its public tag and module artifacts are available:
+Install the published v2.0.1 release:
 
 ```sh
 go get github.com/faustbrian/go-router/v2@v2.0.1
 ```
 
-Existing v2 applications can retain released v2.0.0 until the patch is
-published. Legacy consumers can retain
+Existing v2 applications can retain released v2.0.0 while planning an
+upgrade. Legacy consumers can retain
 `github.com/faustbrian/go-router@v1.0.0`; do not bypass publication with a
 local replacement or pseudo-version.
 

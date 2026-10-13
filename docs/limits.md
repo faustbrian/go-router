@@ -1,5 +1,7 @@
 # Resource Limits
 
+[Documentation index](README.md)
+
 `DefaultLimits` supplies a complete positive construction budget. Callers may
 replace it with `WithLimits`; every field must remain positive. Limits are
 checked before a compiled router is published and generation limits are checked
@@ -59,3 +61,5 @@ Each group child receives only the parent's remaining route and group budget.
 An exhausted group count is rejected before another callback runs, and route
 registration inside a group cannot consume capacity already used by its
 parent.
+
+Continue with [API Reference](api.md).

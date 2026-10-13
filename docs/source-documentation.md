@@ -1,5 +1,7 @@
 # Source documentation audit
 
+[Documentation index](README.md)
+
 ## Audited boundary
 
 Baseline `fde5afea62dd6de3878414ffcc6c91cc7e96a719` contains one root

@@ -1,5 +1,7 @@
 # Performance
 
+[Documentation index](README.md)
+
 Compilation sorts copied descriptors and performs package and standard-library
 conflict checks. The package-owned host overlap audit is pairwise, so bounded
 worst-case startup time is `O(routes²)` and route storage is `O(routes)`.
@@ -30,3 +32,5 @@ allocations at 16 middleware layers; and 14.5 microseconds, 53.6 kB, and 301
 allocations for a copied 100-route table. These development measurements are
 directional, not release budgets. Preserve the same duration when comparing
 new measurements with this baseline.
+
+Continue with [API Reference](api.md).

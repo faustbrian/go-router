@@ -1,5 +1,7 @@
 # Architecture
 
+[Documentation index](README.md)
+
 The package has two phases. A single-owner builder validates and flattens route
 descriptors. Compilation registers package-produced patterns in fresh
 `http.ServeMux` values and publishes immutable copied indexes. Dispatch is a
@@ -15,3 +17,5 @@ Integration packages retain ownership of their concerns. `service` receives
 the compiled router as an `http.Handler`; JSON-RPC, webhook, health, metrics,
 and debug endpoints are ordinary handlers; authentication, authorization,
 rate limiting, idempotency, and telemetry are ordinary middleware.
+
+Continue with [API Reference](api.md).

@@ -1,5 +1,7 @@
 # Security
 
+[Documentation index](README.md)
+
 ## Threat model
 
 The router treats route definitions, request targets, authorities, wildcard

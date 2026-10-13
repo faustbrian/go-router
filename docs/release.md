@@ -1,5 +1,7 @@
 # Release Process
 
+[Documentation index](README.md)
+
 The root module uses `github.com/faustbrian/go-router/v2` and root `v2.x.y`
 tags on main. Eligibility does not establish publication. The owned
 `go-http-middleware/integration/siblings` and
@@ -19,3 +21,5 @@ against the public v2 module without local replacements after publication.
 
 Route names and exported APIs are SemVer contracts after v1. Security releases
 must not disclose a private advisory before coordinated publication.
+
+Continue with [API Reference](api.md).

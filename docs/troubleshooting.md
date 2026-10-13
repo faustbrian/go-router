@@ -1,5 +1,7 @@
 # Troubleshooting
 
+[Documentation index](README.md)
+
 - `invalid route`: inspect the structured `Error.Field`; check method casing,
   absolute paths, wildcard identifiers, ASCII hosts, handlers, and limits.
 - `route conflict`: compare method, canonical host wildcard shape, and path
@@ -17,3 +19,5 @@
   the mounted remainder route owns the latter boundary.
 - URL generation error: supply exactly each required wildcard, use
   `Remainder` for `{name...}`, and reject dot segments before retrying.
+
+Continue with [API Reference](api.md).
